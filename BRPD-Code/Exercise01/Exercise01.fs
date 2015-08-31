@@ -161,27 +161,46 @@ module ex2_1 =
 //                                 closedin erhs vs && closedin ebody vs1
 //        | Prim(ope, e1, e2) -> closedin e1 vs && closedin e2 vs
 
-    let rec 
+    let e1 = Let(["z", CstI 17], Prim("+", Var "z", Var "z"))
+    
+    let e2 = Let(["z", CstI 17], 
+                 Prim("+", Let(["z", CstI 22], Prim("*", CstI 100, Var "z")),
+                           Var "z"))
+    
+    let e3 = Let(["z", Prim("-", CstI 5, CstI 4)], 
+                 Prim("*", CstI 100, Var "z"))
+    
+    let e4 = Prim("+", Prim("+", CstI 20, Let(["z", CstI 17], Prim("+", Var "z", CstI 2))), CstI 30)
+    
+    let e5 = Prim("*", CstI 2, Let(["x", CstI 3], Prim("+", Var "x", CstI 4)))
+    
+    let e6 = Let(["z", Var "x"], Prim("+", Var "z", Var "x"))
+    let e7 = Let(["z", CstI 3], Let(["y", Prim("+", Var "z", CstI 1)], Prim("+", Var "z", Var "y")))
+    let e8 = Let(["z", Let(["x", CstI 4], Prim("+", Var "x", CstI 5))], Prim("*", Var "z", CstI 2))
+    let e9 = Let(["z", CstI 3], Let(["y", Prim("+", Var "z", CstI 1)], Prim("+", Var "x", Var "y")))
+    let e10 = Let(["z", Prim("+", Let(["x", CstI 4], Prim("+", Var "x", CstI 5)), Var "x")], Prim("*", Var "z", CstI 2))
+    let e11 = Let(["z", CstI 17;"x",CstI 3], Prim("+", Var "z", Var "x"))//Let(["x", CstI 17;"z",Prim("+", CstI 3, CstI 3)], Prim("+", Var "x", Var "x"))
+
     let rec eval e (env : (string * int) list) : int =
         match e with
         | CstI i            -> i
         | Var x             -> lookup env x
         | Let(list, ebody) -> 
-            let inner (x,ehrs:expr) env1 =
-                let xval = eval ehrs env
-                let env2 = (x, xval) :: env1
-                eval ebody env2
-            let rec iterateList list acc : int = 
+            let rec buildEnv list accEnv =
                 match list with
-                | [] -> acc
-                | x::xs -> (iterateList xs ((inner x env)+acc))
-            iterateList list 0
+                | []    -> eval ebody accEnv
+                | (x,ehrs)::xs -> let xval = eval ehrs accEnv
+                                  let env1 = (x, xval) :: accEnv
+                                  buildEnv xs env1
+            buildEnv list env
         | Prim("+", e1, e2) -> eval e1 env + eval e2 env
         | Prim("*", e1, e2) -> eval e1 env * eval e2 env
         | Prim("-", e1, e2) -> eval e1 env - eval e2 env
-        | Prim _            -> failwith "unknown primitive";;
+        | Prim _            -> failwith "unknown primitive"
 
-    let run e = eval e [];;
+    let run e = eval e []
+    let res = List.map run [e1;e2;e3;e4;e5;e7;e8;e11]
+
 (*
 Exercise 2.2
 *)
