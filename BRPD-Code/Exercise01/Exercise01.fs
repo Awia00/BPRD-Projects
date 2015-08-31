@@ -180,6 +180,7 @@ module ex2_1 =
     let e9 = Let(["z", CstI 3], Let(["y", Prim("+", Var "z", CstI 1)], Prim("+", Var "x", Var "y")))
     let e10 = Let(["z", Prim("+", Let(["x", CstI 4], Prim("+", Var "x", CstI 5)), Var "x")], Prim("*", Var "z", CstI 2))
     let e11 = Let(["z", CstI 17;"x",CstI 3], Prim("+", Var "z", Var "x"))//Let(["x", CstI 17;"z",Prim("+", CstI 3, CstI 3)], Prim("+", Var "x", Var "x"))
+    let e12 = Prim("+", Var "x", Var "z")
 
     let rec eval e (env : (string * int) list) : int =
         match e with
@@ -204,12 +205,71 @@ module ex2_1 =
 (*
 Exercise 2.2
 *)
+    let rec mem x vs = 
+        match vs with
+        | []      -> false
+        | v :: vr -> x=v || mem x vr
 
+    let rec union (xs, ys) = 
+        match xs with 
+        | []    -> ys
+        | x::xr -> if mem x ys then union(xr, ys)
+                   else x :: union(xr, ys)
+    let rec minus (xs, ys) = 
+        match xs with 
+        | []    -> []
+        | x::xr -> if mem x ys then minus(xr, ys)
+                   else x :: minus (xr, ys)
 
+    let rec freevars e : string list =
+        match e with
+        | CstI i -> []
+        | Var x  -> [x]
+        | Let(list, ebody) -> 
+            let rec lets letsList accList =
+                match letsList with
+                | [] -> accList
+                | (x,ehrs)::xs -> lets xs ((freevars ehrs)@accList)
+            union ((lets list []), minus (freevars ebody, List.map (fun (x,y) -> x) list))
+        | Prim(ope, e1, e2) -> union (freevars e1, freevars e2)
+    
+    let closed2 e = (freevars e = [])
+    let test = List.map closed2 [e1;e2;e3;e4;e5;e6;e7;e8;e9;e10;e11;e12]
 (*
 Exercise 2.3
 *)
+    type texpr =                            (* target expressions *)
+      | TCstI of int
+      | TVar of int                         (* index into runtime environment *)
+      | TLet of texpr * texpr               (* erhs and ebody                 *)
+      | TPrim of string * texpr * texpr
 
+    let rec getindex vs x = 
+        match vs with 
+        | []    -> failwith "Variable not found"
+        | y::yr -> if x=y then 0 else 1 + getindex yr x
+
+    let rec teval (e : texpr) (renv : int list) : int =
+        match e with
+        | TCstI i -> i
+        | TVar n  -> List.nth renv n
+        | TLet(erhs, ebody) -> 
+            let xval = teval erhs renv
+            let renv1 = xval :: renv 
+            teval ebody renv1 
+        | TPrim("+", e1, e2) -> teval e1 renv + teval e2 renv
+        | TPrim("*", e1, e2) -> teval e1 renv * teval e2 renv
+        | TPrim("-", e1, e2) -> teval e1 renv - teval e2 renv
+        | TPrim _            -> failwith "unknown primitive"
+
+    let rec tcomp (e : expr) (cenv : string list) : texpr =
+        match e with
+        | CstI i -> TCstI i
+        | Var x  -> TVar (getindex cenv x)
+        | Let(list, ebody) -> 
+            let cenv1 = (List.map (fun (x,y) -> x) list) @ cenv
+            List.foldBack TLet list (tcomp ebody cenv1)
+        | Prim(ope, e1, e2) -> TPrim(ope, tcomp e1 cenv, tcomp e2 cenv)
 
 (*
 Exercise 2.6
