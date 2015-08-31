@@ -145,7 +145,7 @@ module ex2_1 =
     type expr = 
       | CstI of int
       | Var of string
-      | Let of (string * expr) * expr * expr
+      | Let of (string * expr) list * expr
       | Prim of string * expr * expr
 
     let rec lookup env x =
@@ -153,14 +153,29 @@ module ex2_1 =
         | []        -> failwith (x + " not found")
         | (y, v)::r -> if x=y then v else lookup r x
 
-    let rec eval e (env : ((string*expr) * int) list) : int =
+//    let rec closedin (e : expr) (vs : string list) : bool =
+//        match e with
+//        | CstI i -> true
+//        | Var x -> List.exists (fun y -> x=y) vs
+//        | Let(x, erhs, ebody) -> let vs1 = x :: vs
+//                                 closedin erhs vs && closedin ebody vs1
+//        | Prim(ope, e1, e2) -> closedin e1 vs && closedin e2 vs
+
+    let rec 
+    let rec eval e (env : (string * int) list) : int =
         match e with
         | CstI i            -> i
         | Var x             -> lookup env x
-        | Let(x, erhs, ebody) -> 
-            let xval = eval erhs env
-            let env1 = (x, xval) :: env
-            eval ebody env1
+        | Let(list, ebody) -> 
+            let inner (x,ehrs:expr) env1 =
+                let xval = eval ehrs env
+                let env2 = (x, xval) :: env1
+                eval ebody env2
+            let rec iterateList list acc : int = 
+                match list with
+                | [] -> acc
+                | x::xs -> (iterateList xs ((inner x env)+acc))
+            iterateList list 0
         | Prim("+", e1, e2) -> eval e1 env + eval e2 env
         | Prim("*", e1, e2) -> eval e1 env * eval e2 env
         | Prim("-", e1, e2) -> eval e1 env - eval e2 env
