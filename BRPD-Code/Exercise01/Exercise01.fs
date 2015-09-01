@@ -153,14 +153,6 @@ module ex2_1 =
         | []        -> failwith (x + " not found")
         | (y, v)::r -> if x=y then v else lookup r x
 
-//    let rec closedin (e : expr) (vs : string list) : bool =
-//        match e with
-//        | CstI i -> true
-//        | Var x -> List.exists (fun y -> x=y) vs
-//        | Let(x, erhs, ebody) -> let vs1 = x :: vs
-//                                 closedin erhs vs && closedin ebody vs1
-//        | Prim(ope, e1, e2) -> closedin e1 vs && closedin e2 vs
-
     let e1 = Let(["z", CstI 17], Prim("+", Var "z", Var "z"))
     
     let e2 = Let(["z", CstI 17], 
@@ -186,7 +178,7 @@ module ex2_1 =
         match e with
         | CstI i            -> i
         | Var x             -> lookup env x
-        | Let(list, ebody) -> 
+        | Let(list, ebody) ->  // only this match is changed
             let rec buildEnv list accEnv =
                 match list with
                 | []    -> eval ebody accEnv
@@ -225,7 +217,7 @@ Exercise 2.2
         match e with
         | CstI i -> []
         | Var x  -> [x]
-        | Let(list, ebody) -> 
+        | Let(list, ebody) -> // only this match is changed
             let rec lets letsList accList =
                 match letsList with
                 | [] -> accList
@@ -266,11 +258,32 @@ Exercise 2.3
         match e with
         | CstI i -> TCstI i
         | Var x  -> TVar (getindex cenv x)
-        | Let(list, ebody) -> 
+        | Let(list, ebody) ->  // Only this match is changed
             let cenv1 = (List.map (fun (x,y) -> x) list) @ cenv
-            List.foldBack TLet list (tcomp ebody cenv1)
+            let convertedList = List.map (fun (x,erhs) -> tcomp erhs cenv) list
+            List.foldBack (fun x y -> TLet (x,y)) convertedList (tcomp ebody cenv1)
         | Prim(ope, e1, e2) -> TPrim(ope, tcomp e1 cenv, tcomp e2 cenv)
 
 (*
 Exercise 2.6
 *)
+    let simE = Let(["x",CstI 11], Let(["x", CstI 22; "y", Prim("+",Var "x", CstI 1)], Prim("+",Var "x", Var "y")))
+    
+    let rec evalSim e (env : (string * int) list) : int =
+        match e with
+        | CstI i            -> i
+        | Var x             -> lookup env x
+        | Let(list, ebody) ->  // only this match is changed
+            let rec buildEnv list accEnv =
+                match list with
+                | []    -> evalSim ebody accEnv
+                | (x,ehrs)::xs -> let xval = evalSim ehrs accEnv
+                                  let env1 = (x, xval) :: accEnv
+                                  buildEnv xs env1
+            buildEnv list env
+        | Prim("+", e1, e2) -> evalSim e1 env + evalSim e2 env
+        | Prim("*", e1, e2) -> evalSim e1 env * evalSim e2 env
+        | Prim("-", e1, e2) -> evalSim e1 env - evalSim e2 env
+        | Prim _            -> failwith "unknown primitive"
+
+    let testSim = evalSim simE [] // should return 22
