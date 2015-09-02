@@ -264,6 +264,10 @@ Exercise 2.3
             List.foldBack (fun x y -> TLet (x,y)) convertedList (tcomp ebody cenv1)
         | Prim(ope, e1, e2) -> TPrim(ope, tcomp e1 cenv, tcomp e2 cenv)
 
+
+    let runT e = teval (tcomp e []) []
+    let resT = List.map run [e1;e2;e3;e4;e5;e7;e8;e11]
+
 (*
 Exercise 2.6 I have not finished this exercise.
 *)
