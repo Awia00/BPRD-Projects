@@ -265,7 +265,7 @@ Exercise 2.3
         | Prim(ope, e1, e2) -> TPrim(ope, tcomp e1 cenv, tcomp e2 cenv)
 
 (*
-Exercise 2.6
+Exercise 2.6 I have not finished this exercise.
 *)
     let simE = Let(["x",CstI 11], Let(["x", CstI 22; "y", Prim("+",Var "x", CstI 1)], Prim("+",Var "x", Var "y")))
     
