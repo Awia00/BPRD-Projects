@@ -50,6 +50,7 @@
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <Compile Include="Exercise01.fs" />
+    <Compile Include="Exercise02.fs" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>

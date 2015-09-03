@@ -1,0 +1,135 @@
+﻿module Exercise02
+
+
+(*
+    Exercise 3.2
+*)
+
+// regex: ^(a(b+a?)*|(b+a?)+)$
+// tested on http://regexr.com/ with flags: global and multiline
+
+// NFA See image NFA.jpg
+// DFA See image DFA.jpg
+
+(*
+    Exercise 3.3
+*)
+
+(*
+    
+*)
+
+
+(*
+    Exercise 3.4
+*)
+
+(*
+    Exercise 3.5
+*)
+
+(*
+    Here are some examples of programs which can be lexed and parsed
+    fromString("x+5*3");;
+    val it : Absyn.expr = Prim ("+",Var "x",Prim ("*",CstI 5,CstI 3))
+
+    fromString("let z = 5+1 in z*2 end");;
+        val it : Absyn.expr = Let ("z",Prim ("+",CstI 5,CstI 1),Prim ("*",Var "z",CstI 2))
+
+    fromString("let z = (let x = 4 in x*x end) in (let y = 5 in z*y end) end");;
+    val it : Absyn.expr =
+      Let
+        ("z",Let ("x",CstI 4,Prim ("*",Var "x",Var "x")),
+         Let ("y",CstI 5,Prim ("*",Var "z",Var "y")))
+
+*)
+
+(*
+    Exercise 3.6
+*)
+(* 
+    I use Visual Studio 2013
+    This method was added to the Parse module 
+    open Expr
+    let compString (s:string) : sinstr list = scomp (fromString(s)) []
+    
+    Testing
+    compString "2+2";;
+    val it : Expr.sinstr list = [SCstI 2; SCstI 2; SAdd]
+
+    compString "let z = (let x = 4 in x*x end) in (let y = 5 in z*y end) end";;
+    val it : Expr.sinstr list =
+      [SCstI 4; SVar 0; SVar 1; SMul; SSwap; SPop; SCstI 5; SVar 1; SVar 1; SMul;
+       SSwap; SPop; SSwap; SPop]
+
+    compString "let z = 5+1 in z*2 end";;
+    val it : Expr.sinstr list =
+    [SCstI 5; SCstI 1; SAdd; SVar 0; SCstI 2; SMul; SSwap; SPop]
+*)
+(*
+    Exercise 3.7
+*)
+
+// in Absyn.fs
+(*
+    type expr = 
+      | CstI of int
+      | Var of string
+      | Let of string * expr * expr
+      | Prim of string * expr * expr
+      | If of expr * expr * expr
+*)
+// in ExprPar.fsl
+(*
+    %token <int> CSTINT
+    %token <string> NAME
+    %token PLUS MINUS TIMES DIVIDE EQ
+    %token IF THEN ELSE
+    %token END IN LET
+    %token LPAR RPAR
+    %token EOF
+
+    Expr:
+        NAME                                { Var $1            }
+      | CSTINT                              { CstI $1           }
+      | MINUS CSTINT                        { CstI (- $2)       }
+      | LPAR Expr RPAR                      { $2                }
+      | IF Expr THEN Expr ELSE Expr			{ If($2, $4, $6)    }
+      | LET NAME EQ Expr IN Expr END        { Let($2, $4, $6)   }
+      | Expr TIMES Expr                     { Prim("*", $1, $3) }
+      | Expr PLUS  Expr                     { Prim("+", $1, $3) }  
+      | Expr MINUS Expr                     { Prim("-", $1, $3) } 
+    ;
+*)
+
+// In ExprLex
+(*
+    let keyword s =
+        match s with
+        | "let"  -> LET
+        | "in"   -> IN
+        | "end"  -> END
+        | "if"   -> IF
+        | "then" -> THEN
+        | "else" -> ELSE
+        | _      -> NAME s
+*)
+
+// Test Examples of fromString();;
+(*
+    fromString("if 2 then 5 else 6");;
+    val it : Absyn.expr = If (CstI 2,CstI 5,CstI 6)
+
+    fromString("if 2+2 then 5+x else 5-x");;
+    val it : Absyn.expr =
+      If
+        (Prim ("+",CstI 2,CstI 2),Prim ("+",CstI 5,Var "x"),
+         Prim ("-",CstI 5,Var "x"))
+
+    fromString("if let z = (let x = 4 in x*x end) in (let y = 5 in z*y end) end then 2 else 3");;
+    val it : Absyn.expr =
+      If
+        (Let
+           ("z",Let ("x",CstI 4,Prim ("*",Var "x",Var "x")),
+            Let ("y",CstI 5,Prim ("*",Var "z",Var "y"))),CstI 2,CstI 3)
+*)
