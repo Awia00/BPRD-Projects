@@ -59,6 +59,9 @@
 *)
 (* 
     I use Visual Studio 2013
+    I have added the ExprVS2013 solution in this assignment with all the changes I have made. But if you dont want to unpack it you can see everything I did here.
+
+    
     This method was added to the Parse module 
     open Expr
     let compString (s:string) : sinstr list = scomp (fromString(s)) []
