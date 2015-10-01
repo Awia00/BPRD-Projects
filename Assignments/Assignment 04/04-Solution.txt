@@ -90,7 +90,7 @@ let rec eval (e : expr) (env : value env) : value =
         let fBodyEnv = (x, xVal) :: (f, fClosure) :: fDeclEnv
         in eval fBody fBodyEnv
       | Clos (x, fBody, fDeclEnv) ->
-        let xVal = eval eArg env
+        let xVal	 = eval eArg env
         let fBodyEnv = (x, xVal) :: fDeclEnv
         in eval fBody fBodyEnv
       | _ -> failwith "eval Call: not a function";;
@@ -173,7 +173,50 @@ AtExpr:
 
 
 ##Exercise 6.4
+i) The tree can be seen in treei.jpg
+The reason f is polymorphic is because no matter the input it will always return int. A clear reason for this is that f is used in two different ways: as a function and as an input (f f: the first used as function the last value).
 
+ii) the tree can be seen in treeii.jpg
+f should only be able to take ints since x's value must always be int. Since f's body includes a < operation and < requires the two exprs to be integers therefore f cannot be polymorph.
 
 ##Exercise 6.5
 
+i)
+let f x = 1
+in f f end
+
+Has the type int 
+...because f is polymorphic and always return 1 no matter the input (even if the input is f in this case)
+
+ii)
+let f g = g g
+in f end
+
+Does not have a type since it is circular, meaning that it continues forever to find the type. Inside f g cannot be polymorph and therefore it creates a problem when g is supposed to be both alpha goes to beta and alpha.
+
+iii)
+let f x =
+	let g y = y
+	in g false end
+in f 42 end
+
+Has the type bool
+...because when g is called it returns y and y is in this case false. X is never used inside f and therefore has no meaning for the result.
+
+iv)
+let f x =
+	let g y = if true then y else x
+	in g false end
+in f 42 end
+
+Has both the type bool and integer. This is not well formed therefore the type interference fails.
+The reason why is that y is false when g is called and x is 42 when f is called. Therefore we get then false else 42 which micro ml cannot handle.
+
+v)
+let f x =
+	let g y = if true then y else x
+	in g false end
+in f true end
+
+Has the type bool
+...because f is called with true and and g is called with false, therefore no both y and x is booleans.
