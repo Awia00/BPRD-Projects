@@ -133,6 +133,17 @@ let rec exec stmt (locEnv : locEnv) (gloEnv : gloEnv) (store : store) : store =
               if v<>0 then loop (exec body locEnv gloEnv store2)
                       else store2
       loop store
+    | For(e1, e2, e3, body) ->
+      let (valueInit, storeInit) = eval e1 locEnv gloEnv store
+      let rec loop store1 =
+              let (vCondition, store2) = eval e2 locEnv gloEnv store1
+              if vCondition<>0 
+                then
+                    let store3 = exec body locEnv gloEnv store2
+                    let (vAfter, storeFinal) = eval e3 locEnv gloEnv store3
+                    loop storeFinal
+                else store2
+      loop storeInit
     | Expr e -> 
       let (_, store1) = eval e locEnv gloEnv store 
       store1 

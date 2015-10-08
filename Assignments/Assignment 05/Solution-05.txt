@@ -25,3 +25,109 @@ see Exercise02/ii.c
 iii)
 > run(fromFile "Exercise02/iii.c") [7];;
 see Exercise02/iii.c
+
+
+Exercise 03
+I have not used the clever solution to just use block while and Expr, but I have created my own abstract syntax type.
+
+I have changed the following in Interp.fs
+let rec exec stmt (locEnv : locEnv) (gloEnv : gloEnv) (store : store) : store = 
+    match stmt with
+    | If(e, stmt1, stmt2) -> 
+      let (v, store1) = eval e locEnv gloEnv store
+      if v<>0 then exec stmt1 locEnv gloEnv store1
+              else exec stmt2 locEnv gloEnv store1
+    | While(e, body) ->
+      let rec loop store1 =
+              let (v, store2) = eval e locEnv gloEnv store1
+              if v<>0 then loop (exec body locEnv gloEnv store2)
+                      else store2
+      loop store
+    | For(e1, e2, e3, body) ->
+      let (valueInit, storeInit) = eval e1 locEnv gloEnv store
+      let rec loop store1 =
+              let (vCondition, store2) = eval e2 locEnv gloEnv store1
+              if vCondition<>0 
+                then
+                    let store3 = exec body locEnv gloEnv store2
+                    let (vAfter, storeFinal) = eval e3 locEnv gloEnv store3
+                    loop storeFinal
+                else store2
+      loop storeInit
+    | Expr e -> 
+      let (_, store1) = eval e locEnv gloEnv store 
+      store1 
+    | Block stmts -> 
+      let rec loop ss (locEnv, store) = 
+          match ss with 
+          | [ ] -> store
+          | s1::sr -> loop sr (stmtordec s1 locEnv gloEnv store)
+      loop stmts (locEnv, store) 
+    | Return _ -> failwith "return not implemented"
+
+
+I have changed the following in Absyn.fs
+
+and stmt =                                                         
+  | If of expr * stmt * stmt         (* Conditional                 *)
+  | While of expr * stmt             (* While loop                  *)
+  | For of expr * expr * expr * stmt (* for loop                  *)
+  | Expr of expr                     (* Expression statement   e;   *)
+  | Return of expr option            (* Return from method          *)
+  | Block of stmtordec list          (* Block: grouping and scope   *)
+
+
+
+I have changed the following in CLex.fsl
+
+let keyword s =
+    match s with
+    | "char"    -> CHAR 
+    | "else"    -> ELSE
+    | "false"   -> CSTBOOL 0
+    | "if"      -> IF
+    | "int"     -> INT
+    | "null"    -> NULL
+    | "print"   -> PRINT
+    | "println" -> PRINTLN
+    | "return"  -> RETURN
+    | "true"    -> CSTBOOL 1
+    | "void"    -> VOID 
+    | "while"   -> WHILE         
+    | "for"     -> FOR   
+    | _         -> NAME s
+
+
+I have changed the following in CPar.fsy
+
+%token CHAR ELSE IF INT NULL PRINT PRINTLN RETURN VOID WHILE FOR
+
+StmtM:  /* No unbalanced if-else */
+    Expr SEMI                                     { Expr($1)             }
+  | RETURN SEMI                                   { Return None          }
+  | RETURN Expr SEMI                              { Return(Some($2))     }
+  | Block                                         { $1                   }
+  | IF LPAR Expr RPAR StmtM ELSE StmtM            { If($3, $5, $7)       }
+  | WHILE LPAR Expr RPAR StmtM                    { While($3, $5)        }
+  | FOR LPAR Expr SEMI Expr SEMI Expr RPAR StmtM  { For($3, $5, $7, $9)  }
+;
+
+StmtU:
+    IF LPAR Expr RPAR StmtM ELSE StmtU            { If($3, $5, $7)       }
+  | IF LPAR Expr RPAR Stmt                        { If($3, $5, Block []) }
+  | WHILE LPAR Expr RPAR StmtU                    { While($3, $5)        }
+  | FOR LPAR Expr SEMI Expr SEMI Expr RPAR StmtU  { For($3, $5, $7, $9)  }
+;
+
+
+i)
+> run(fromFile "Exercise03/i.c") [10];;
+see Exercise03/i.c
+
+ii)
+> run(fromFile "Exercise03/ii.c") [5];;
+see Exercise03/ii.c
+
+iii)
+> run(fromFile "Exercise03/iii.c") [7];;
+see Exercise03/iii.c
