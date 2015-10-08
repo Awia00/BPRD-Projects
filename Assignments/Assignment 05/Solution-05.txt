@@ -1,0 +1,27 @@
+Assignment 05
+Anders Wind - awis@itu.dk
+
+
+Exercise 01 : done
+
+I have added micro-c and run the two examples
+
+Exercise 02 
+... a few more examples
+> open ParseAndRun;;
+> run(fromFile "Exercise02/example01.c") [2];;
+> run(fromFile "Exercise02/example02.c") [2];;
+> run(fromFile "Exercise02/example03.c") [2];;
+> run(fromFile "Exercise02/example04.c") [2];;
+
+i)
+> run(fromFile "Exercise02/i.c") [10];;
+see Exercise02/i.c
+
+ii)
+> run(fromFile "Exercise02/ii.c") [5];;
+see Exercise02/ii.c
+
+iii)
+> run(fromFile "Exercise02/iii.c") [7];;
+see Exercise02/iii.c
