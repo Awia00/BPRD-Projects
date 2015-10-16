@@ -6,7 +6,7 @@ type token =
   | RPAR
   | EPS
   | STAR
-  | CHOICE
+  | OR
   | CHAR of (char)
 type tokenId = 
     | TOKEN_EOF
@@ -14,7 +14,7 @@ type tokenId =
     | TOKEN_RPAR
     | TOKEN_EPS
     | TOKEN_STAR
-    | TOKEN_CHOICE
+    | TOKEN_OR
     | TOKEN_CHAR
     | TOKEN_end_of_input
     | TOKEN_error
@@ -23,6 +23,7 @@ type nonTerminalId =
     | NONTERM_Main
     | NONTERM_Re
     | NONTERM_Res
+    | NONTERM_ReFinal
 /// This function maps tokens to integer indexes
 val tagOfToken: token -> int
 
