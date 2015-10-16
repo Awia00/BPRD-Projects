@@ -100,16 +100,16 @@ let _fsyacc_dataOfToken (t:token) =
   | STAR  -> (null : System.Object) 
   | OR  -> (null : System.Object) 
   | CHAR _fsyacc_x -> Microsoft.FSharp.Core.Operators.box _fsyacc_x 
-let _fsyacc_gotos = [| 0us; 65535us; 1us; 65535us; 0us; 1us; 4us; 65535us; 0us; 2us; 7us; 4us; 8us; 5us; 14us; 6us; 4us; 65535us; 0us; 8us; 7us; 8us; 8us; 8us; 14us; 8us; 4us; 65535us; 0us; 10us; 7us; 10us; 8us; 9us; 14us; 10us; |]
-let _fsyacc_sparseGotoTableRowOffsets = [|0us; 1us; 3us; 8us; 13us; |]
-let _fsyacc_stateToProdIdxsTableElements = [| 1us; 0us; 1us; 0us; 3us; 1us; 2us; 8us; 1us; 1us; 3us; 2us; 2us; 8us; 2us; 2us; 8us; 3us; 2us; 8us; 9us; 1us; 2us; 2us; 3us; 4us; 2us; 4us; 5us; 1us; 5us; 1us; 6us; 1us; 7us; 1us; 8us; 1us; 9us; 1us; 9us; |]
-let _fsyacc_stateToProdIdxsTableRowOffsets = [|0us; 2us; 4us; 8us; 10us; 14us; 17us; 21us; 23us; 26us; 29us; 31us; 33us; 35us; 37us; 39us; |]
-let _fsyacc_action_rows = 16
-let _fsyacc_actionTableElements = [|3us; 32768us; 1us; 14us; 3us; 12us; 6us; 11us; 0us; 49152us; 3us; 32768us; 0us; 3us; 4us; 13us; 5us; 7us; 0us; 16385us; 1us; 16386us; 4us; 13us; 2us; 32768us; 4us; 13us; 5us; 7us; 3us; 32768us; 2us; 15us; 4us; 13us; 5us; 7us; 3us; 32768us; 1us; 14us; 3us; 12us; 6us; 11us; 3us; 16387us; 1us; 14us; 3us; 12us; 6us; 11us; 0us; 16388us; 0us; 16389us; 0us; 16390us; 0us; 16391us; 0us; 16392us; 3us; 32768us; 1us; 14us; 3us; 12us; 6us; 11us; 0us; 16393us; |]
-let _fsyacc_actionTableRowOffsets = [|0us; 4us; 5us; 9us; 10us; 12us; 15us; 19us; 23us; 27us; 28us; 29us; 30us; 31us; 32us; 36us; |]
+let _fsyacc_gotos = [| 0us; 65535us; 1us; 65535us; 0us; 1us; 3us; 65535us; 0us; 2us; 6us; 4us; 13us; 5us; 3us; 65535us; 0us; 7us; 6us; 7us; 13us; 7us; 4us; 65535us; 0us; 9us; 6us; 9us; 7us; 8us; 13us; 9us; |]
+let _fsyacc_sparseGotoTableRowOffsets = [|0us; 1us; 3us; 7us; 11us; |]
+let _fsyacc_stateToProdIdxsTableElements = [| 1us; 0us; 1us; 0us; 2us; 1us; 2us; 1us; 1us; 2us; 2us; 2us; 2us; 2us; 9us; 1us; 2us; 2us; 3us; 4us; 2us; 4us; 8us; 2us; 5us; 8us; 1us; 6us; 1us; 7us; 1us; 8us; 1us; 9us; 1us; 9us; |]
+let _fsyacc_stateToProdIdxsTableRowOffsets = [|0us; 2us; 4us; 7us; 9us; 12us; 15us; 17us; 20us; 23us; 26us; 28us; 30us; 32us; 34us; |]
+let _fsyacc_action_rows = 15
+let _fsyacc_actionTableElements = [|3us; 32768us; 1us; 13us; 3us; 11us; 6us; 10us; 0us; 49152us; 2us; 32768us; 0us; 3us; 5us; 6us; 0us; 16385us; 0us; 16386us; 2us; 32768us; 2us; 14us; 5us; 6us; 3us; 32768us; 1us; 13us; 3us; 11us; 6us; 10us; 3us; 16387us; 1us; 13us; 3us; 11us; 6us; 10us; 1us; 16388us; 4us; 12us; 1us; 16389us; 4us; 12us; 0us; 16390us; 0us; 16391us; 0us; 16392us; 3us; 32768us; 1us; 13us; 3us; 11us; 6us; 10us; 0us; 16393us; |]
+let _fsyacc_actionTableRowOffsets = [|0us; 4us; 5us; 8us; 9us; 10us; 13us; 17us; 21us; 23us; 25us; 26us; 27us; 28us; 32us; |]
 let _fsyacc_reductionSymbolCounts = [|1us; 2us; 3us; 1us; 2us; 1us; 1us; 1us; 2us; 3us; |]
 let _fsyacc_productionToNonTerminalTable = [|0us; 1us; 2us; 2us; 3us; 3us; 4us; 4us; 4us; 4us; |]
-let _fsyacc_immediateActions = [|65535us; 49152us; 65535us; 16385us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 16389us; 16390us; 16391us; 16392us; 65535us; 16393us; |]
+let _fsyacc_immediateActions = [|65535us; 49152us; 65535us; 16385us; 65535us; 65535us; 65535us; 65535us; 65535us; 65535us; 16390us; 16391us; 16392us; 65535us; 16393us; |]
 let _fsyacc_reductions ()  =    [| 
 # 114 "RePar.fs"
         (fun (parseState : Microsoft.FSharp.Text.Parsing.IParseState) ->
@@ -200,7 +200,7 @@ let _fsyacc_reductions ()  =    [|
                  : 'ReFinal));
 # 201 "RePar.fs"
         (fun (parseState : Microsoft.FSharp.Text.Parsing.IParseState) ->
-            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : Absyn.re)) in
+            let _1 = (let data = parseState.GetInput(1) in (Microsoft.FSharp.Core.Operators.unbox data : 'ReFinal)) in
             Microsoft.FSharp.Core.Operators.box
                 (
                    (

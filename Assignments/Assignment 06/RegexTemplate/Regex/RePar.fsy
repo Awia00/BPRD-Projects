@@ -10,9 +10,9 @@
 %token EOF
 
 %left EOF EPS              /* lowest precedence  */
-%left OR
+%left STAR
 %left LPAR RPAR
-%left STAR                 /* highest precedence  */
+%left OR                 /* highest precedence  */
 
 
 %start Main
@@ -37,6 +37,6 @@ Res:
 ReFinal:
     CHAR                                { Char($1)               }
   | EPS                                 { Eps                    }
-  | Re STAR                             { Star($1)               }
+  | ReFinal STAR                        { Star($1)               }
   | LPAR Re RPAR                        { $2                     }
 ;
