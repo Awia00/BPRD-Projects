@@ -48,6 +48,33 @@ Par: The most notable obstacle to create the parser was to get precedence correc
 
 Exercise 6.2:
 =========================
+In HigherFun.fs I have added the following function
+
+let check (e : expr) : bool = 
+    let rec inner (eNew : expr) (env:string list) : bool =
+        match eNew with
+        | CstI i -> true
+        | CstB b -> true
+        | Var x  -> List.exists (fun y -> y=x) env
+        | Prim(ope, e1, e2) -> 
+          let v1 = inner e1 env
+          let v2 = inner e2 env
+          v1 && v1
+        | Let(x, eRhs, letBody) ->
+          let letEnv = x :: env 
+          inner eRhs env && inner letBody letEnv
+        | If(e1, e2, e3) ->
+            let v1 = inner e1 env
+            let v2 = inner e2 env
+            let v3 = inner e3 env
+            v1 && v2 && v3
+        | Letfun(f, x, fBody, letBody) -> 
+          let bodyEnv = f :: env
+          let fBodyEnv = x :: bodyEnv
+          inner fBody fBodyEnv && inner letBody bodyEnv
+        | Call(eFun, eArg) -> 
+          inner eFun env && inner eArg env
+    inner e []
 
 
 
