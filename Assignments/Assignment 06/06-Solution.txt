@@ -1,5 +1,55 @@
 Assignment 06
 Anders Wind - awis@itu.dk
 
+Exercise 6.1:
+=========================
+The entire solution is placed in the folder RegexTemplate/Regex and is in the form of a Visual Studio project called Regex
+The abstract syntax can be found in Absyn.fs
+
+Sub Exercise 1.1
+The solution can be found in ReLex.fsl
+
+Sub Exercise 1.2
+The solution can be found in RePar.fsy
+
+Sub Exercise 1.3
+The solution can be found in Parse.fs
+
+Sub Exercise 1.4
+I send the project to F# Interactive. Write OpenParseAndRun;;
+
+1)
+> fromString("'a' | 'b' *");;
+val it : Absyn.re = Choice (Char 'a',Star (Char 'b'))
+
+2)
+> fromString("'a'|'b'*");;
+val it : Absyn.re = Choice (Char 'a',Star (Char 'b'))
+
+3)
+> fromString("'a' * 'a' 'a'");;
+val it : Absyn.re = Seq (Seq (Star (Char 'a'),Char 'a'),Char 'a')
+
+> fromString("'a' 'b' * | 'c'");;
+val it : Absyn.re = Choice (Seq (Char 'a',Star (Char 'b')),Char 'c')
+
+4)
+> fromString("( 'a' ('b' *) ) | 'c'");;
+val it : Absyn.re = Choice (Seq (Char 'a',Star (Char 'b')),Char 'c')
+
+5)
+> fromString("( ('a' 'b') * | 'b') *");;
+val it : Absyn.re = Star (Choice (Star (Seq (Char 'a',Char 'b')),Char 'b'))
+
+Sub Exercise 1.5
+Lexer: Special to note is that e parses to epsilon, the same does '' for example "'a'e'a'''". But to allow for this, I had to make the lexing of characters to require them to be surrounded by ''. To begin with I allowed for regexes of the type "ab|c". Unfortunately the lexer does not support matching on special characters as a Char such as '-' or '*', and lexing will fail. An example could be "'a'|'*'". The lexer only supports a-z, A-Z and 0-9.
+
+Par: The most notable obstacle to create the parser was to get precedence correct. To allow for Choice to be matched first, then sequences and then star, I had to create three parsertypes. Re which matches choice, Res which matches Seqences and then a ReFinal which matches the rest of the types. If Paranthesis are present Re is used again on the regular expression inside.
+
+Exercise 6.2:
+=========================
 
 
+
+Exercise 6.3:
+=========================
