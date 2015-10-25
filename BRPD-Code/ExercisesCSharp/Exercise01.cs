@@ -109,17 +109,13 @@ namespace ExercisesCSharp
 
         public override Expr Simplify()
         {
-            if (Expr1 == new CstI(0) && Expr2 == new CstI(0))
+            CstI e1 = Expr1 as CstI;
+            CstI e2 = Expr2 as CstI;
+            if (e1 != null && e2 != null)
             {
-                return new CstI(0);
-            }
-            if (Expr1 == new CstI(0))
-            {
-                return Expr2;
-            }
-            if (Expr2 == new CstI(0))
-            {
-                return Expr1;
+                if (e1.I == 0 && e2.I == 0) return new CstI(0);
+                if (e1.I == 0) return Expr2;
+                if (e2.I == 0) return Expr1;
             }
             return this;
         }
@@ -142,18 +138,15 @@ namespace ExercisesCSharp
         }
         public override Expr Simplify()
         {
-            if (Expr1 == new CstI(0) || Expr2 == new CstI(0))
+            CstI e1 = Expr1 as CstI;
+            CstI e2 = Expr2 as CstI;
+            if (e1 != null && e2 != null)
             {
-                return new CstI(0);
+                if (e1.I == 0 || e2.I == 0) return new CstI(0);
+                if (e1.I == 1) return Expr2;
+                if (e2.I == 1) return Expr1;
             }
-            if (Expr1 == new CstI(1))
-            {
-                return Expr2;
-            }
-            if (Expr2 == new CstI(1))
-            {
-                return Expr1;
-            }
+            
             return this;
         }
     }
@@ -175,17 +168,14 @@ namespace ExercisesCSharp
 
         public override Expr Simplify()
         {
-            if (Expr1 == new CstI(0) && Expr2 == new CstI(0))
+            CstI e1 = Expr1 as CstI;
+            CstI e2 = Expr2 as CstI;
+            if (e1 != null && e2 != null)
             {
-                return new CstI(0);
-            }
-            if (Expr1 == Expr2)
-            {
-                return new CstI(0);
-            }
-            if (Expr2 == new CstI(0))
-            {
-                return Expr1;
+                if (e1.I == 0 && e2.I == 0) return new CstI(0);
+                if (e1.I == e2.I) return new CstI(0);
+                if (e1.I == 0) return new CstI(-e2.I);
+                if (e2.I == 0) return Expr1;
             }
             return this;
         }
