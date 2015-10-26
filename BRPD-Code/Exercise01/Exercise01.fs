@@ -132,8 +132,6 @@ module ex1_2 =
         | Mul (e1,e2)   -> aexpr
         | Sub (e1,e2)   -> aexpr
 
-    //(v)
-
 (*
 Exercise 1.4
 *)
@@ -220,11 +218,8 @@ Exercise 2.2
         | CstI i -> []
         | Var x  -> [x]
         | Let(list, ebody) -> // only this match is changed
-            let rec lets letsList accList =
-                match letsList with
-                | []            -> accList
-                | (x, ehrs)::xs -> lets xs ((freevars ehrs)@accList)
-            union ((lets list []), minus (freevars ebody, List.map (fun (x,y) -> x) list))
+            let nonFreeVars = List.fold (fun vars (x,expr) -> union (vars, minus ([x], freevars expr))) [] list
+            minus (freevars ebody, nonFreeVars) 
         | Prim(ope, e1, e2) -> union (freevars e1, freevars e2)
     
     let e13 = Let([("x", CstI 1);("y", Var "x")],Var "y")
@@ -262,35 +257,11 @@ Exercise 2.3
         | CstI i -> TCstI i
         | Var x  -> TVar (getindex cenv x)
         | Let(list, ebody) ->  // Only this match is changed
-            let cenv1 = (List.map (fun (x,y) -> x) list) @ cenv
-            let convertedList = List.map (fun (x,erhs) -> tcomp erhs cenv) list
-            List.foldBack (fun x y -> TLet (x,y)) convertedList (tcomp ebody cenv1)
+            match list with
+            | []                -> tcomp ebody cenv
+            | (x, expr)::letsr  -> TLet(tcomp expr cenv, tcomp (Let(letsr, ebody)) (x::cenv))
         | Prim(ope, e1, e2) -> TPrim(ope, tcomp e1 cenv, tcomp e2 cenv)
 
 
     let runT e = teval (tcomp e []) []
-    let resT = List.map run [e1;e2;e3;e4;e5;e7;e8;e11]
-
-(*
-Exercise 2.6 I have not finished this exercise.
-*)
-    let simE = Let(["x",CstI 11], Let(["x", CstI 22; "y", Prim("+",Var "x", CstI 1)], Prim("+",Var "x", Var "y")))
-    
-    let rec evalSim e (env : (string * int) list) : int =
-        match e with
-        | CstI i            -> i
-        | Var x             -> lookup env x
-        | Let(list, ebody) ->  // only this match is changed
-            let rec buildEnv list accEnv =
-                match list with
-                | []    -> evalSim ebody accEnv
-                | (x,ehrs)::xs -> let xval = evalSim ehrs accEnv
-                                  let env1 = (x, xval) :: accEnv
-                                  buildEnv xs env1
-            buildEnv list env
-        | Prim("+", e1, e2) -> evalSim e1 env + evalSim e2 env
-        | Prim("*", e1, e2) -> evalSim e1 env * evalSim e2 env
-        | Prim("-", e1, e2) -> evalSim e1 env - evalSim e2 env
-        | Prim _            -> failwith "unknown primitive"
-
-    let testSim = evalSim simE [] // should return 22
+    let resT = List.map run [e1;e2;e3;e4;e5;e7;e8;e11;e13]
