@@ -83,7 +83,7 @@ module ex1_1 =
             | "Max" -> if i1 < i2 then i1 else i2 
             | "=="  -> if i1 = i2 then 1 else 0 
             | _     -> failwith "unknown primitive"
-        | If (e1, e2, e3) -> if (eval3 e1 env)=0 then eval3 e2 env else eval3 e3 env
+        | If (e1, e2, e3) -> if (eval3 e1 env)<>0 then eval3 e2 env else eval3 e3 env
 
     let test = If(Var "a", CstI 11, CstI 22) // this returns 22 when the environment env is used
 
@@ -103,6 +103,7 @@ module ex1_2 =
     //(ii)
     let exampleAexpr01 = Sub (Var "v", Add (Var "w", Var "z"))
     let exampleAexpr02 = Mul (CstI 2, exampleAexpr01)
+    let exampleAexpr03 = Add (Var "x", Add (Var "y", Add (Var "z", Var "v")))
     
     //(iii)
     let rec fmt aexpr : string = 
@@ -207,6 +208,7 @@ Exercise 2.2
         | []    -> ys
         | x::xr -> if mem x ys then union(xr, ys)
                    else x :: union(xr, ys)
+
     let rec minus (xs, ys) = 
         match xs with 
         | []    -> []
@@ -220,13 +222,14 @@ Exercise 2.2
         | Let(list, ebody) -> // only this match is changed
             let rec lets letsList accList =
                 match letsList with
-                | [] -> accList
-                | (x,ehrs)::xs -> lets xs ((freevars ehrs)@accList)
+                | []            -> accList
+                | (x, ehrs)::xs -> lets xs ((freevars ehrs)@accList)
             union ((lets list []), minus (freevars ebody, List.map (fun (x,y) -> x) list))
         | Prim(ope, e1, e2) -> union (freevars e1, freevars e2)
     
+    let e13 = Let([("x", CstI 1);("y", Var "x")],Var "y")
     let closed2 e = (freevars e = [])
-    let test = List.map closed2 [e1;e2;e3;e4;e5;e6;e7;e8;e9;e10;e11;e12]
+    let test = List.map closed2 [e1;e2;e3;e4;e5;e6;e7;e8;e9;e10;e11;e12;e13]
 (*
 Exercise 2.3
 *)
