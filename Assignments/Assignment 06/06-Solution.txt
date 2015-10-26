@@ -80,3 +80,4 @@ let check (e : expr) : bool =
 
 Exercise 6.3:
 =========================
+Not done.
