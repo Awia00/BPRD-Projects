@@ -12,6 +12,10 @@ type token =
   | COMMA
   | ASSIGN
   | AMP
+  | SWITCH
+  | CASE
+  | COLON
+  | QSTMARK
   | PREDEC
   | PREINC
   | NOT
@@ -54,6 +58,10 @@ type tokenId =
     | TOKEN_COMMA
     | TOKEN_ASSIGN
     | TOKEN_AMP
+    | TOKEN_SWITCH
+    | TOKEN_CASE
+    | TOKEN_COLON
+    | TOKEN_QSTMARK
     | TOKEN_PREDEC
     | TOKEN_PREINC
     | TOKEN_NOT
@@ -100,6 +108,8 @@ type nonTerminalId =
     | NONTERM_StmtOrDecSeq
     | NONTERM_Stmt
     | NONTERM_StmtM
+    | NONTERM_CaseHolder
+    | NONTERM_Cases
     | NONTERM_StmtU
     | NONTERM_Expr
     | NONTERM_ExprNotAccess
@@ -108,6 +118,7 @@ type nonTerminalId =
     | NONTERM_Exprs
     | NONTERM_Exprs1
     | NONTERM_Const
+    | NONTERM_IntConst
     | NONTERM_Type
 /// This function maps integers indexes to symbolic token ids
 val tagOfToken: token -> int

@@ -121,7 +121,15 @@ let rec cStmt stmt (varEnv : varEnv) (funEnv : funEnv) : instr list =
       cExpr e varEnv funEnv @ [IFZERO labelse] 
       @ cStmt stmt1 varEnv funEnv @ [GOTO labend]
       @ [Label labelse] @ cStmt stmt2 varEnv funEnv
-      @ [Label labend]
+      @ [Label labend]     
+    | Switch(name, list) ->
+        let labend  = newLabel()
+        let rec buildList cases accList : instr list =
+            match cases with
+            | [] -> accList
+            | (x,stmt)::xs -> let labelTrue = newLabel()
+                              buildList xs ([DUP; CSTI x; EQ; IFNZRO labelTrue] @ accList @ [Label labelTrue] @ cStmt stmt varEnv funEnv @ [GOTO labend])
+        cAccess (AccVar name) varEnv funEnv @ buildList list [] @ [Label labend; INCSP -1]
     | While(e, body) ->
       let labbegin = newLabel()
       let labtest  = newLabel()

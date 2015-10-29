@@ -204,8 +204,13 @@ and
 
 
 To test I created the testfile exercise8-3.c in the folder Tests:
-open ParseAndComp;;
-compileToFile(fromFile "Tests/exercise8-3.c") "ex8-3.out";;
+  open ParseAndComp;;
+  compileToFile(fromFile "Tests/exercise8-3.c") "ex8-3.out";;
+  
+  #q;;
+  
+  javac Machine.java
+  java Machine ex8-3.out
 
 Exercise 8.4:
 =========================
@@ -349,7 +354,7 @@ and
       AtExprNotAccess                     { $1                  }
     | Access ASSIGN Expr                  { Assign($1, $3)      }
     | NAME LPAR Exprs RPAR                { Call($1, $3)        }
-    | Expr QSTMARK Expr COLON Expr        { ExprIf($3, $5, $7) }  
+    | Expr QSTMARK Expr COLON Expr        { ExprIf($1, $3, $5)  }  
     | NOT Expr                            { Prim1("!", $2)      }
     | PREINC Access                       { PreInc($2)          }
     | PREDEC Access                       { PreDec($2)          }
@@ -371,8 +376,195 @@ and
 
 
 In Comp I changed
-
+  and cExpr (e : expr) (varEnv : varEnv) (funEnv : funEnv) : instr list = 
+      match e with
+      | Access acc        -> cAccess acc varEnv funEnv @ [LDI] 
+      | Assign(acc, e)    -> cAccess acc varEnv funEnv @ cExpr e varEnv funEnv @ [STI]
+      | PreInc(acc)       -> (cAccess acc varEnv funEnv) @ [DUP; LDI; CSTI 1; ADD; STI] 
+      | PreDec(acc)       -> (cAccess acc varEnv funEnv) @ [DUP; LDI; CSTI 1; SUB; STI]
+      | CstI i            -> [CSTI i]
+      | Addr acc          -> cAccess acc varEnv funEnv
+      | ExprIf(e1,e2,e3)  -> 
+          let labelse = newLabel()
+          let labend  = newLabel()
+          cExpr e1 varEnv funEnv @ [IFZERO labelse] 
+          @ cExpr e2 varEnv funEnv @ [GOTO labend]
+          @ [Label labelse] @ cExpr e3 varEnv funEnv
+          @ [Label labend]
+      | Prim1(ope, e1) ->
+        cExpr e1 varEnv funEnv
+        @ (match ope with
+          | "!"      -> [NOT]
+          | "printi" -> [PRINTI]
+          | "printc" -> [PRINTC]
+          | _        -> raise (Failure "unknown primitive 1"))
+      | Prim2(ope, e1, e2) ->
+        cExpr e1 varEnv funEnv
+        @ cExpr e2 varEnv funEnv
+        @ (match ope with
+          | "*"   -> [MUL]
+          | "+"   -> [ADD]
+          | "-"   -> [SUB]
+          | "/"   -> [DIV]
+          | "%"   -> [MOD]
+          | "=="  -> [EQ]
+          | "!="  -> [EQ; NOT]
+          | "<"   -> [LT]
+          | ">="  -> [LT; NOT]
+          | ">"   -> [SWAP; LT]
+          | "<="  -> [SWAP; LT; NOT]
+          | _     -> raise (Failure "unknown primitive 2"))
+      | Andalso(e1, e2) ->
+        let labend   = newLabel()
+        let labfalse = newLabel()
+        cExpr e1 varEnv funEnv
+        @ [IFZERO labfalse]
+        @ cExpr e2 varEnv funEnv
+        @ [GOTO labend; Label labfalse; CSTI 0; Label labend]            
+      | Orelse(e1, e2) -> 
+        let labend  = newLabel()
+        let labtrue = newLabel()
+        cExpr e1 varEnv funEnv
+        @ [IFNZRO labtrue]
+        @ cExpr e2 varEnv funEnv
+        @ [GOTO labend; Label labtrue; CSTI 1; Label labend]
+      | Call(f, es) -> callfun f es varEnv funEnv
+    
+    
+To test I created the testfile exercise8-5.c in the folder Tests:
+  open ParseAndComp;;
+  compileToFile(fromFile "Tests/exercise8-5.c") "ex8-5.out";;
+  
+  #q;;
+  
+  javac Machine.java
+  java Machine ex8-5.out
 
 
 Exercise 8.6:
-=========================
+========================
+In Absyn I changed:
+  and stmt =                                                         
+    | If of expr * stmt * stmt         (* Conditional                 *)
+    | Switch of string * (int * stmt) list (* Switch                  *)
+    | While of expr * stmt             (* While loop                  *)
+    | Expr of expr                     (* Expression statement   e;   *)
+    | Return of expr option            (* Return from method          *)
+    | Block of stmtordec list          (* Block: grouping and scope   *)
+    
+    
+In CLex I changed:
+  let keyword s =
+      match s with
+      | "char"    -> CHAR 
+      | "else"    -> ELSE
+      | "false"   -> CSTBOOL 0
+      | "if"      -> IF
+      | "int"     -> INT
+      | "null"    -> NULL
+      | "print"   -> PRINT
+      | "println" -> PRINTLN
+      | "return"  -> RETURN
+      | "true"    -> CSTBOOL 1
+      | "void"    -> VOID 
+      | "while"   -> WHILE 
+      | "switch"  -> SWITCH
+      | "case"    -> CASE     
+      | _         -> NAME s
+      
+
+In CPar I changed:
+  StmtM:  /* No unbalanced if-else */
+      Expr SEMI                           { Expr($1)             }
+    | RETURN SEMI                         { Return None          }
+    | RETURN Expr SEMI                    { Return(Some($2))     }
+    | Block                               { $1                   }
+    | SWITCH LPAR NAME RPAR CaseHolder    { Switch($3, $5)       }
+    | IF LPAR Expr RPAR StmtM ELSE StmtM  { If($3, $5, $7)       }
+    | WHILE LPAR Expr RPAR StmtM          { While($3, $5)        }
+  ;
+  
+  CaseHolder:
+    LBRACE Cases RBRACE                  { $2                   }
+  ;
+  
+  Cases:
+      CASE IntConst COLON Block           { [($2, $4)]        }
+    | CASE IntConst COLON Block Cases     { ($2, $4) :: $5    }
+  ;
+
+  
+and
+
+  Const:
+      IntConst                            { $1       }
+    | MINUS CSTINT                        { - $2     }
+    | NULL                                { -1       }
+  ;
+  
+  IntConst:
+      CSTINT                              { $1       }
+    | MINUS CSTINT                        { - $2     }
+  ;
+
+and
+
+  %token CHAR ELSE IF INT NULL PRINT PRINTLN RETURN VOID WHILE
+  %token PLUS MINUS TIMES DIV MOD
+  %token EQ NE GT LT GE LE
+  %token NOT SEQOR SEQAND
+  %token PREDEC PREINC
+  %token COLON QSTMARK
+  %token SWITCH CASE
+  %token LPAR RPAR LBRACE RBRACE LBRACK RBRACK SEMI COMMA ASSIGN AMP
+  %token EOF
+
+
+In Comp I changed:
+  let rec cStmt stmt (varEnv : varEnv) (funEnv : funEnv) : instr list = 
+      match stmt with
+      | If(e, stmt1, stmt2) -> 
+        let labelse = newLabel()
+        let labend  = newLabel()
+        cExpr e varEnv funEnv @ [IFZERO labelse] 
+        @ cStmt stmt1 varEnv funEnv @ [GOTO labend]
+        @ [Label labelse] @ cStmt stmt2 varEnv funEnv
+        @ [Label labend]     
+      | Switch(name, list) ->
+          let labend  = newLabel()
+          let rec buildList cases accList : instr list =
+              match cases with
+              | [] -> accList
+              | (x,stmt)::xs -> let labelTrue = newLabel()
+                                buildList xs ([DUP; CSTI x; EQ; IFNZRO labelTrue] @ accList @ [Label labelTrue] @ cStmt stmt varEnv funEnv @ [GOTO labend])
+          cAccess (AccVar name) varEnv funEnv @ buildList list [] @ [Label labend; INCSP -1]
+      | While(e, body) ->
+        let labbegin = newLabel()
+        let labtest  = newLabel()
+        [GOTO labtest; Label labbegin] @ cStmt body varEnv funEnv
+        @ [Label labtest] @ cExpr e varEnv funEnv @ [IFNZRO labbegin]
+      | Expr e -> 
+        cExpr e varEnv funEnv @ [INCSP -1]
+      | Block stmts -> 
+        let rec loop stmts varEnv =
+            match stmts with 
+            | []     -> (snd varEnv, [])
+            | s1::sr -> 
+              let (varEnv1, code1) = cStmtOrDec s1 varEnv funEnv
+              let (fdepthr, coder) = loop sr varEnv1 
+              (fdepthr, code1 @ coder)
+        let (fdepthend, code) = loop stmts varEnv
+        code @ [INCSP(snd varEnv - fdepthend)]
+      | Return None -> 
+        [RET (snd varEnv - 1)]
+      | Return (Some e) -> 
+        cExpr e varEnv funEnv @ [RET (snd varEnv)]
+
+To test I created the testfile exercise8-6.c in the folder Tests:
+  open ParseAndComp;;
+  compileToFile(fromFile "Tests/exercise8-6.c") "ex8-6.out";;
+  
+  #q;;
+  
+  javac Machine.java
+  java Machine ex8-6.out
