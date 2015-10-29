@@ -16,6 +16,9 @@ type typ =
 and expr =                                                         
   | Access of access                 (* x    or  *p    or  a[e]     *)
   | Assign of access * expr          (* x=e  or  *p=e  or  a[e]=e   *)
+  | PreInc of access                 (* ++x                         *)
+  | PreDec of access                 (* --x                         *)
+  | ExprIf of expr * expr * expr     (* Conditional e ? s1 : s2     *)
   | Addr of access                   (* &x   or  &*p   or  &a[e]    *)
   | CstI of int                      (* Constant                    *)
   | Prim1 of string * expr           (* Unary primitive operator    *)

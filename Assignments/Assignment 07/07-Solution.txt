@@ -3,18 +3,375 @@ Anders Wind - awis@itu.dk
 
 Exercise 8.1:
 =========================
+i) Done
 
+ii)
+ex3:
+  LDARGS; CALL (1,"L1"); STOP; 			void main(int n)  	
+  
+  Label "L1"; INCSP 1; 					int i;
+  GETBP; CSTI 1; ADD; CSTI 0; STI; 		i=0;
+  INCSP -1; GOTO "L3"; 					clean stack and goto while
+  
+  Label "L2"; 							// inside while
+  GETBP; CSTI 1; ADD; LDI; PRINTI; 		print i; 
+  INCSP -1; 								
+  GETBP; CSTI 1; ADD;						i
+  GETBP; CSTI 1; ADD; LDI; CSTI 1; ADD;	i+1
+  STI; 									=
+  INCSP -1; INCSP 0; 						clean stack, the second command is because the code is unoptimized.
+  
+  Label "L3";								"while"
+  GETBP; CSTI 1; ADD; LDI; 				i
+  GETBP; CSTI 0; ADD; LDI; 				n
+  LT; IFNZRO "L2";						< { // if not ero go into while.
+  INCSP -1; RET 0]						} } // jump over loop: done and return.
 
+ex5:
+  LDARGS; CALL (1,"L1"); STOP;			void main(int n) {
+  
+  Label "L1"; INCSP 1; 					int r; 
+  GETBP; CSTI 1; ADD; 					r
+  GETBP; CSTI 0; ADD; LDI; 				n
+  STI; 									=
+  INCSP -1; 								// go inside block
+  INCSP 1; 								int r; // new local r
+  GETBP; CSTI 0; ADD; LDI; 				n
+  GETBP; CSTI 2; ADD; 					&r // location of new r
+  CALL (2,"L2"); 							square // call square
+  INCSP -1; 								
+  GETBP; CSTI 2; ADD; LDI; PRINTI;		print r; // local r	
+  INCSP -1; INCSP -1; 					// go out of block
+  GETBP; CSTI 1; ADD; LDI; PRINTI; 		print r; // first  r
+  INCSP -1; INCSP -1; RET 0; 				//return void.
+  
+  // square method.
+  Label "L2"; GETBP; CSTI 1; ADD; LDI; 	*rp
+  GETBP; CSTI 0; ADD; LDI; 				i
+  GETBP; CSTI 0; ADD; LDI; 				i
+  MUL; 									*
+  STI; 									=
+  INCSP -1; INCSP 0; RET 1				//return to last method
+   
 Exercise 8.3:
 =========================
+In Comp.c I changed the function: cExpr
+  and cExpr (e : expr) (varEnv : varEnv) (funEnv : funEnv) : instr list = 
+      match e with
+      | Access acc     -> cAccess acc varEnv funEnv @ [LDI] 
+      | Assign(acc, e) -> cAccess acc varEnv funEnv @ cExpr e varEnv funEnv @ [STI]
+      | PreInc(acc)    -> (cAccess acc varEnv funEnv) @ [DUP; LDI; CSTI 1; ADD; STI] 
+      | PreDec(acc)    -> (cAccess acc varEnv funEnv) @ [DUP; LDI; CSTI 1; SUB; STI]
+      | CstI i         -> [CSTI i]
+      | Addr acc       -> cAccess acc varEnv funEnv
+      | Prim1(ope, e1) ->
+        cExpr e1 varEnv funEnv
+        @ (match ope with
+          | "!"      -> [NOT]
+          | "printi" -> [PRINTI]
+          | "printc" -> [PRINTC]
+          | _        -> raise (Failure "unknown primitive 1"))
+      | Prim2(ope, e1, e2) ->
+        cExpr e1 varEnv funEnv
+        @ cExpr e2 varEnv funEnv
+        @ (match ope with
+          | "*"   -> [MUL]
+          | "+"   -> [ADD]
+          | "-"   -> [SUB]
+          | "/"   -> [DIV]
+          | "%"   -> [MOD]
+          | "=="  -> [EQ]
+          | "!="  -> [EQ; NOT]
+          | "<"   -> [LT]
+          | ">="  -> [LT; NOT]
+          | ">"   -> [SWAP; LT]
+          | "<="  -> [SWAP; LT; NOT]
+          | _     -> raise (Failure "unknown primitive 2"))
+      | Andalso(e1, e2) ->
+        let labend   = newLabel()
+        let labfalse = newLabel()
+        cExpr e1 varEnv funEnv
+        @ [IFZERO labfalse]
+        @ cExpr e2 varEnv funEnv
+        @ [GOTO labend; Label labfalse; CSTI 0; Label labend]            
+      | Orelse(e1, e2) -> 
+        let labend  = newLabel()
+        let labtrue = newLabel()
+        cExpr e1 varEnv funEnv
+        @ [IFNZRO labtrue]
+        @ cExpr e2 varEnv funEnv
+        @ [GOTO labend; Label labtrue; CSTI 1; Label labend]
+      | Call(f, es) -> callfun f es varEnv funEnv
+	
+In Absyn I changed:
+  and expr =                                                         
+    | Access of access                 (* x    or  *p    or  a[e]     *)
+    | Assign of access * expr          (* x=e  or  *p=e  or  a[e]=e   *)
+    | PreInc of access                 (* ++x *)
+    | PreDec of access                 (* --x *)
+    | Addr of access                   (* &x   or  &*p   or  &a[e]    *)
+    | CstI of int                      (* Constant                    *)
+    | Prim1 of string * expr           (* Unary primitive operator    *)
+    | Prim2 of string * expr * expr    (* Binary primitive operator   *)
+    | Andalso of expr * expr           (* Sequential and              *)
+    | Orelse of expr * expr            (* Sequential or               *)
+    | Call of string * expr list       (* Function call f(...)        *)
 
+In CLex.fsl
+  rule Token = parse
+    | [' ' '\t' '\r'] { Token lexbuf }
+    | '\n'            { lexbuf.EndPos <- lexbuf.EndPos.NextLine; Token lexbuf }
+    | ['0'-'9']+      { CSTINT (System.Int32.Parse (lexemeAsString lexbuf)) }  
+    | ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']*
+                      { keyword (lexemeAsString lexbuf) }
+    | '+'             { PLUS } 
+    | "++"            { PREINC } 
+    | '-'             { MINUS }
+    | "--"            { PREDEC } 
+    | '*'             { TIMES } 
+    | '/'             { DIV } 
+    | '%'             { MOD }                     
+    | '='             { ASSIGN } 
+    | "=="            { EQ } 
+    | "!="            { NE }
+    | '>'             { GT }
+    | '<'             { LT }
+    | ">="            { GE }
+    | "<="            { LE }
+    | "||"            { SEQOR }                     
+    | "&&"            { SEQAND }                     
+    | "&"             { AMP }                     
+    | "!"             { NOT }                     
+    | '('             { LPAR }
+    | ')'             { RPAR }
+    | '{'             { LBRACE }
+    | '}'             { RBRACE }
+    | '['             { LBRACK }
+    | ']'             { RBRACK }
+    | ';'             { SEMI }
+    | ','             { COMMA }
+    | "//"            { EndLineComment lexbuf; Token lexbuf }
+    | "/*"            { Comment lexbuf; Token lexbuf }
+    | '"'             { CSTSTRING (String [] lexbuf) }
+    | eof             { EOF }
+    | _               { failwith "Lexer error: illegal symbol" }
+
+In CPar.fsy
+  ExprNotAccess:
+      AtExprNotAccess                     { $1                  }
+    | Access ASSIGN Expr                  { Assign($1, $3)      }
+    | NAME LPAR Exprs RPAR                { Call($1, $3)        }  
+    | NOT Expr                            { Prim1("!", $2)      }
+    | PREINC Access                       { PreInc($2)          }
+    | PREDEC Access                       { PreDec($2)          }
+    | PRINT Expr                          { Prim1("printi", $2) }
+    | PRINTLN                             { Prim1("printc", nl) }
+    | Expr PLUS  Expr                     { Prim2("+",  $1, $3) }
+    | Expr MINUS Expr                     { Prim2("-",  $1, $3) }
+    | Expr TIMES Expr                     { Prim2("*",  $1, $3) }
+    | Expr DIV   Expr                     { Prim2("/",  $1, $3) }
+    | Expr MOD   Expr                     { Prim2("%",  $1, $3) }
+    | Expr EQ    Expr                     { Prim2("==", $1, $3) }
+    | Expr NE    Expr                     { Prim2("!=", $1, $3) }
+    | Expr GT    Expr                     { Prim2(">",  $1, $3) }
+    | Expr LT    Expr                     { Prim2("<",  $1, $3) }
+    | Expr GE    Expr                     { Prim2(">=", $1, $3) }
+    | Expr LE    Expr                     { Prim2("<=", $1, $3) }
+    | Expr SEQAND Expr                    { Andalso($1, $3)     }
+    | Expr SEQOR  Expr                    { Orelse($1, $3)      }
+;
+and
+
+  %token CHAR ELSE IF INT NULL PRINT PRINTLN RETURN VOID WHILE
+  %token PLUS MINUS TIMES DIV MOD
+  %token EQ NE GT LT GE LE
+  %token NOT SEQOR SEQAND
+  %token PREDEC PREINC
+  %token LPAR RPAR LBRACE RBRACE LBRACK RBRACK SEMI COMMA ASSIGN AMP
+  %token EOF
+  
+  %right ASSIGN             /* lowest precedence */
+  %nonassoc PRINT
+  %left SEQOR
+  %left SEQAND
+  %left EQ NE 
+  %nonassoc GT LT GE LE
+  %left PLUS MINUS
+  %left TIMES DIV MOD
+  %nonassoc NOT AMP
+  %nonassoc LBRACK
+  %nonassoc PREDEC PREINC         /* highest precedence  */
+
+
+To test I created the testfile exercise8-3.c in the folder Tests:
+open ParseAndComp;;
+compileToFile(fromFile "Tests/exercise8-3.c") "ex8-3.out";;
 
 Exercise 8.4:
 =========================
+open ParseAndComp;;
+compileToFile(fromFile "ex8.c") "ex8.out";;
 
+Symbol bytecode:
+  LDARGS; CALL (1,"L1"); STOP; Label "L1"; INCSP 1; INCSP 1; INCSP 100; GETSP;
+  CSTI 99; SUB; INCSP 100; GETSP; CSTI 99; SUB; INCSP 100; GETSP; CSTI 99;
+  SUB; INCSP 100; GETSP; CSTI 99; SUB; GETBP; CSTI 2; ADD; CSTI 1; STI;
+  INCSP -1; GOTO "L3"; Label "L2"; GETBP; CSTI 103; ADD; LDI; GETBP; CSTI 2;
+  ADD; LDI; ADD; CSTI 0; STI; INCSP -1; GETBP; CSTI 2; ADD; GETBP; CSTI 2;
+  ADD; LDI; CSTI 1; ADD; STI; INCSP -1; INCSP 0; Label "L3"; GETBP; CSTI 2;
+  ADD; LDI; GETBP; CSTI 0; ADD; LDI; SWAP; LT; NOT; IFNZRO "L2"; GETBP;
+  CSTI 2; ADD; CSTI 1; STI; INCSP -1; GOTO "L5"; Label "L4"; GETBP; CSTI 204;
+  ADD; LDI; GETBP; CSTI 2; ADD; LDI; ADD; GETBP; CSTI 305; ADD; LDI; GETBP;
+  CSTI 2; ADD; LDI; ADD; CSTI 0; STI; STI; INCSP -1; GETBP; CSTI 2; ADD; ...]
+
+Ex8.c creates a lot of redundant instructioner,which makes each iteration a lot slower.
+Whereas prog1 is much cleaner.
+
+open ParseAndComp;;
+compileToFile(fromFile "ex13.c") "ex13.out";;
+
+Symbol bytecode:
+   LDARGS; CALL (1,"L1"); STOP; 
+   
+   Label "L1"; INCSP 1; 
+   GETBP; CSTI 1; ADD; CSTI 1889; STI; 
+   INCSP -1; GOTO "L3"; 
+   
+   Label "L2"; 
+   GETBP; CSTI 1; ADD; 
+   GETBP; CSTI 1; ADD; LDI; 
+   CSTI 1; 
+   ADD; 
+   STI; INCSP -1; 
+   GETBP; CSTI 1; ADD; LDI;
+   CSTI 4; MOD; 
+   CSTI 0; EQ; IFZERO "L7"; 
+   GETBP; CSTI 1; ADD; LDI; 
+   CSTI 100; MOD; 
+   CSTI 0; EQ; NOT; IFNZRO "L9"; 
+   GETBP; CSTI 1; ADD; LDI; 
+   CSTI 400; MOD;
+   CSTI 0; EQ; GOTO "L8";
+   
+   Label "L9"; CSTI 1; 
+   
+   Label "L8"; GOTO "L6";
+   
+   Label "L7"; CSTI 0; 
+   
+   Label "L6"; IFZERO "L4"; GETBP; CSTI 1; ADD; LDI;
+   PRINTI; INCSP -1; GOTO "L5"; 
+   
+   Label "L4"; INCSP 0; 
+   
+   Label "L5"; INCSP 0;
+   
+   Label "L3";  // while condition
+   GETBP; CSTI 1; ADD; LDI; 
+   GETBP; CSTI 0; ADD; LDI; 
+   LT; IFNZRO "L2";  // go to l2 inside while
+   INCSP -1; RET 0]
+
+The condition for the while loop is in the L3 label.
+If the condition is true then it goes to label l2 which is the body of the while loop.
+The compiler has created a bunch of labels which are not really necessary L9, L8, L7 and so on.
 
 Exercise 8.5:
 =========================
+In Absyn i changed
+  and expr =                                                         
+    | Access of access                 (* x    or  *p    or  a[e]     *)
+    | Assign of access * expr          (* x=e  or  *p=e  or  a[e]=e   *)
+    | PreInc of access                 (* ++x                         *)
+    | PreDec of access                 (* --x                         *)
+    | ExprIf of expr * expr * expr     (* Conditional e ? s1 : s2     *)
+    | Addr of access                   (* &x   or  &*p   or  &a[e]    *)
+    | CstI of int                      (* Constant                    *)
+    | Prim1 of string * expr           (* Unary primitive operator    *)
+    | Prim2 of string * expr * expr    (* Binary primitive operator   *)
+    | Andalso of expr * expr           (* Sequential and              *)
+    | Orelse of expr * expr            (* Sequential or               *)
+    | Call of string * expr list       (* Function call f(...)        *)
+
+In CLex I changed
+  rule Token = parse
+    | [' ' '\t' '\r'] { Token lexbuf }
+    | '\n'            { lexbuf.EndPos <- lexbuf.EndPos.NextLine; Token lexbuf }
+    | ['0'-'9']+      { CSTINT (System.Int32.Parse (lexemeAsString lexbuf)) }  
+    | ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']*
+                      { keyword (lexemeAsString lexbuf) }
+    | '+'             { PLUS } 
+    | "++"            { PREINC } 
+    | '-'             { MINUS }
+    | "--"            { PREDEC } 
+    | '*'             { TIMES } 
+    | '/'             { DIV } 
+    | '%'             { MOD }                     
+    | '='             { ASSIGN } 
+    | "=="            { EQ } 
+    | "!="            { NE }
+    | '>'             { GT }
+    | '<'             { LT }
+    | ">="            { GE }
+    | "<="            { LE }
+    | "||"            { SEQOR }                     
+    | "&&"            { SEQAND }                     
+    | "&"             { AMP }                     
+    | "!"             { NOT }                     
+    | "?"             { QSTMARK }    
+    | ":"             { COLON }    
+    | '('             { LPAR }
+    | ')'             { RPAR }
+    | '{'             { LBRACE }
+    | '}'             { RBRACE }
+    | '['             { LBRACK }
+    | ']'             { RBRACK }
+    | ';'             { SEMI }
+    | ','             { COMMA }
+    | "//"            { EndLineComment lexbuf; Token lexbuf }
+    | "/*"            { Comment lexbuf; Token lexbuf }
+    | '"'             { CSTSTRING (String [] lexbuf) }
+    | eof             { EOF }
+    | _               { failwith "Lexer error: illegal symbol" }
+
+In CPar I changed
+  %token CHAR ELSE IF INT NULL PRINT PRINTLN RETURN VOID WHILE
+  %token PLUS MINUS TIMES DIV MOD
+  %token EQ NE GT LT GE LE
+  %token NOT SEQOR SEQAND
+  %token PREDEC PREINC
+  %token COLON QSTMARK
+  %token LPAR RPAR LBRACE RBRACE LBRACK RBRACK SEMI COMMA ASSIGN AMP
+  %token EOF
+  
+and 
+  ExprNotAccess:
+      AtExprNotAccess                     { $1                  }
+    | Access ASSIGN Expr                  { Assign($1, $3)      }
+    | NAME LPAR Exprs RPAR                { Call($1, $3)        }
+    | Expr QSTMARK Expr COLON Expr        { ExprIf($3, $5, $7) }  
+    | NOT Expr                            { Prim1("!", $2)      }
+    | PREINC Access                       { PreInc($2)          }
+    | PREDEC Access                       { PreDec($2)          }
+    | PRINT Expr                          { Prim1("printi", $2) }
+    | PRINTLN                             { Prim1("printc", nl) }
+    | Expr PLUS  Expr                     { Prim2("+",  $1, $3) }
+    | Expr MINUS Expr                     { Prim2("-",  $1, $3) }
+    | Expr TIMES Expr                     { Prim2("*",  $1, $3) }
+    | Expr DIV   Expr                     { Prim2("/",  $1, $3) }
+    | Expr MOD   Expr                     { Prim2("%",  $1, $3) }
+    | Expr EQ    Expr                     { Prim2("==", $1, $3) }
+    | Expr NE    Expr                     { Prim2("!=", $1, $3) }
+    | Expr GT    Expr                     { Prim2(">",  $1, $3) }
+    | Expr LT    Expr                     { Prim2("<",  $1, $3) }
+    | Expr GE    Expr                     { Prim2(">=", $1, $3) }
+    | Expr LE    Expr                     { Prim2("<=", $1, $3) }
+    | Expr SEQAND Expr                    { Andalso($1, $3)     }
+    | Expr SEQOR  Expr                    { Orelse($1, $3)      }
+
+
+In Comp I changed
+
 
 
 Exercise 8.6:
