@@ -3,46 +3,46 @@ Anders Wind - awis@itu.dk
 
 Exercise 9.1:
 =========================
-i)
+i) c# code
   .method public hidebysig static void  SelectionSort(int32[] arr) cil managed
   {
     // Code size       57 (0x39)
     .maxstack  4
-    .locals init (int32 V_0,		// free space to 0:i, 1:least, 2:tmp and 3:j weird since tmp should be declared after j.
+    .locals init (int32 V_0,		   // free space to 0:i, 1:least, 2:tmp and 3:j weird since tmp should be declared after j.
              int32 V_1,
              int32 V_2,
              int32 V_3)
 	// first for loop begins
-    IL_0000:  ldc.i4.0				// push on stack 0
-    IL_0001:  stloc.0				// put 0 into variable 0: i
-    IL_0002:  br.s       IL_0032	// branch to label IL_0032
+    IL_0000:  ldc.i4.0				     // push on stack 0
+    IL_0001:  stloc.0				       // put 0 into variable 0: i
+    IL_0002:  br.s       IL_0032	 // branch to label IL_0032
 	
 	//first loop body
-    IL_0004:  ldloc.0				// load 0:i
-    IL_0005:  stloc.1				// store into 1:least
+    IL_0004:  ldloc.0				       // load 0:i
+    IL_0005:  stloc.1				       // store into 1:least
 	// second for loop begins
-    IL_0006:  ldloc.0				// load 0:i
-    IL_0007:  ldc.i4.1				// push 1 on stack
-    IL_0008:  add					// add 1 and i
-    IL_0009:  stloc.3				// save result in local variabel 3: temp
-    IL_000a:  br.s       IL_001a	// branch to label IL_001a
+    IL_0006:  ldloc.0				       // load 0:i
+    IL_0007:  ldc.i4.1				     // push 1 on stack
+    IL_0008:  add					         // add 1 and i
+    IL_0009:  stloc.3				       // save result in local variabel 3: temp
+    IL_000a:  br.s       IL_001a	 // branch to label IL_001a
 	
 	//second loop body: if statement starts
-    IL_000c:  ldarg.0				// load array arr
-    IL_000d:  ldloc.3				// load 3:j
-    IL_000e:  ldelem.i4				// arr[j] - access
-    IL_000f:  ldarg.0				// load arr
-    IL_0010:  ldloc.1				// load 1:least
-    IL_0011:  ldelem.i4				// arr[least] - access
-    IL_0012:  bge.s      IL_0016	// branch to IL_0016 if vlaue is greater than or equal to: arr[j] < arr[least]
+    IL_000c:  ldarg.0				       // load array arr
+    IL_000d:  ldloc.3				       // load 3:j
+    IL_000e:  ldelem.i4				     // arr[j] - access
+    IL_000f:  ldarg.0				       // load arr
+    IL_0010:  ldloc.1				       // load 1:least
+    IL_0011:  ldelem.i4		         // arr[least] - access
+    IL_0012:  bge.s      IL_0016	 // branch to IL_0016 if vlaue is greater than or equal to: arr[j] < arr[least]
 
 	//if statement body: least = j
     IL_0014:  ldloc.3				// load 3:j
     IL_0015:  stloc.1				// store into 1:least
 	//second loop final statement
     IL_0016:  ldloc.3				// load 3:j
-    IL_0017:  ldc.i4.1				// push 1 to stack;
-    IL_0018:  add					// add together: j++
+    IL_0017:  ldc.i4.1		  // push 1 to stack;
+    IL_0018:  add					  // add together: j++
     IL_0019:  stloc.3				// store into 3:j;
 	// second loop condition
     IL_001a:  ldloc.3				// load 3:j
@@ -54,87 +54,98 @@ i)
 	// int tmp = arr[i];
     IL_0020:  ldarg.0				// load arr
     IL_0021:  ldloc.0				// load 0:i
-    IL_0022:  ldelem.i4				// arr[i] - access
+    IL_0022:  ldelem.i4		  // arr[i] - access
     IL_0023:  stloc.2				// save into 2:tmp
 	// arr[i] = arr[least]
-    IL_0024:  ldarg.0				// load arr
-    IL_0025:  ldloc.0				// load 0:i
-    IL_0026:  ldarg.0				// load arr
-    IL_0027:  ldloc.1				// load 1:least
+    IL_0024:  ldarg.0				  // load arr
+    IL_0025:  ldloc.0				  // load 0:i
+    IL_0026:  ldarg.0				  // load arr
+    IL_0027:  ldloc.1				  // load 1:least
     IL_0028:  ldelem.i4				// arr[least] - access
     IL_0029:  stelem.i4				// store into arr[i]
 	//arr[least] = tmp; 
-    IL_002a:  ldarg.0				// load arr
-    IL_002b:  ldloc.1				// load 1:least
-    IL_002c:  ldloc.2				// load 2:tmp
-    IL_002d:  stelem.i4				// store into arr
+    IL_002a:  ldarg.0				   // load arr
+    IL_002b:  ldloc.1				   // load 1:least
+    IL_002c:  ldloc.2				   // load 2:tmp
+    IL_002d:  stelem.i4				 // store into arr
 	
 	//first loop final statement
     IL_002e:  ldloc.0				// load 0:i
-    IL_002f:  ldc.i4.1				// push one to stack
-    IL_0030:  add					// add together: i++
+    IL_002f:  ldc.i4.1		  // push one to stack
+    IL_0030:  add					  // add together: i++
     IL_0031:  stloc.0				// store into i
 	//first loop condition
-    IL_0032:  ldloc.0				// load 0:i
-    IL_0033:  ldarg.0				// load arr
-    IL_0034:  ldlen					// length of arr
-    IL_0035:  conv.i4				// convert to int32
-    IL_0036:  blt.s      IL_0004	// branch to label IL_0004 if less than i < arr.Length
+    IL_0032:  ldloc.0				       // load 0:i
+    IL_0033:  ldarg.0				       // load arr
+    IL_0034:  ldlen					       // length of arr
+    IL_0035:  conv.i4				       // convert to int32
+    IL_0036:  blt.s      IL_0004	 // branch to label IL_0004 if less than i < arr.Length
 
     IL_0038:  ret
   } // end of method Exercise81::SelectionSort
   
   
- ii)
+ ii) java code
    public static void SelectionSort(int[]);
     descriptor: ([I)V
     flags: ACC_PUBLIC, ACC_STATIC
     Code:
-      stack=4, locals=4, args_size=1
-         0: iconst_0
-         1: istore_1
-         2: iload_1
-         3: aload_0
-         4: arraylength
-         5: if_icmpge     57
-         8: iload_1
-         9: istore_2
-        10: iload_1
-        11: iconst_1
-        12: iadd
-        13: istore_3
-        14: iload_3
-        15: aload_0
-        16: arraylength
-        17: if_icmpge     37
-        20: aload_0
-        21: iload_3
-        22: iaload
-        23: aload_0
-        24: iload_2
-        25: iaload
-        26: if_icmpge     31
-        29: iload_3
-        30: istore_2
-        31: iinc          3, 1
-        34: goto          14
-        37: aload_0
-        38: iload_1
-        39: iaload
-        40: istore_3
-        41: aload_0
-        42: iload_1
-        43: aload_0
-        44: iload_2
-        45: iaload
-        46: iastore
-        47: aload_0
-        48: iload_2
-        49: iload_3
-        50: iastore
-        51: iinc          1, 1
-        54: goto          2
-        57: return
+      stack=4, locals=4, args_size=1 // create 4 locals
+      // first loop start
+         0: iconst_0            // push constant 0 on stack  
+         1: istore_1            // store into 1:i
+      // first loop condition
+         2: iload_1             // load 1:i
+         3: aload_0             // load arr
+         4: arraylength         // length of arr
+         5: if_icmpge     57    // if v1 greater than v2 go to instr 57.
+      // first loop body:
+         8: iload_1             // load 1:i
+         9: istore_2            // store into 2:least
+      // second loop start
+        10: iload_1             // load 1:i
+        11: iconst_1            // push 1 onto stack
+        12: iadd                // add togehter: i+1;
+        13: istore_3            // store into 3:j
+      // second loop condition
+        14: iload_3             // load 3:j
+        15: aload_0             // load arr
+        16: arraylength         // length of arr
+        17: if_icmpge     37    // if v1 greater than v2 go to instr 37
+      // second loop body: if statement
+        20: aload_0             // load arr
+        21: iload_3             // load 3:j
+        22: iaload              // arr[j]
+        23: aload_0             // load arr
+        24: iload_2             // load 2:least
+        25: iaload              // arr[least]
+        26: if_icmpge     31    // if v1 greather than v2 go to 31
+      // if body
+        29: iload_3             // load 3:j
+        30: istore_2            // store into 2:least
+      // second loop final statement
+        31: iinc          3, 1  // j++
+        34: goto          14    // go to instr 14
+      // int tmp = arr[i]
+        37: aload_0             // load arr
+        38: iload_1             // load 1:i
+        39: iaload              // arr[i]
+        40: istore_3            // save into 3:j // this i dont know why - it should be 4:tmp
+      // arr[i] = arr[least]
+        41: aload_0             // load arr
+        42: iload_1             // load 1:j
+        43: aload_0             // load arr
+        44: iload_2             // load 2:least
+        45: iaload              // arr[least]
+        46: iastore             // store into a[i]
+      // arr[least] = tmp
+        47: aload_0             // load arr
+        48: iload_2             // load 2:least
+        49: iload_3             // load 3:j // again dont know why its not 4:tmp
+        50: iastore             // store into arr[least]
+        51: iinc          1, 1  // i++
+        54: goto          2     // go to instr 2
+        57: return              // return from method
       LineNumberTable:
         line 3: 0
         line 4: 8
@@ -157,3 +168,20 @@ i)
           offset_delta = 5
         frame_type = 249 /* chop */
           offset_delta = 19
+
+
+Exercise 9.2:
+=========================
+i) 
+  Done
+
+ii)
+I have added a picture "Assignment 8.2/GarbageCollectionResult.PNG" of the perfmon result - it shows 50-60% usage by the garbage collector. 
+I ran multiple tests and the string builder had ~0% usage which makes sense, while the string concatenation used 40-60% each time.
+
+I run 64bit processor - Windows 10 - .NET 4.6
+
+iii)
+I have added a picture of a result from another .NET c# program.
+"Assignment 8.2/8.2-iii-Results.PNG"
+As shown - a maximum of 3% is used by the garbage collector.
