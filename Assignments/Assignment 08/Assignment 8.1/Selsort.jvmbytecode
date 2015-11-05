@@ -1,0 +1,120 @@
+Classfile /E:/User (D)/Programmering/BPRD-Projects/Assignments/Assignment 08/Assignment 8.1/Selsort.class
+  Last modified 05-11-2015; size 451 bytes
+  MD5 checksum 5462c36f0f5903d0be26dc5cd43fc1c8
+  Compiled from "Selsort.java"
+class Selsort
+  minor version: 0
+  major version: 52
+  flags: ACC_SUPER
+Constant pool:
+   #1 = Methodref          #3.#15         // java/lang/Object."<init>":()V
+   #2 = Class              #16            // Selsort
+   #3 = Class              #17            // java/lang/Object
+   #4 = Utf8               <init>
+   #5 = Utf8               ()V
+   #6 = Utf8               Code
+   #7 = Utf8               LineNumberTable
+   #8 = Utf8               SelectionSort
+   #9 = Utf8               ([I)V
+  #10 = Utf8               StackMapTable
+  #11 = Utf8               main
+  #12 = Utf8               ([Ljava/lang/String;)V
+  #13 = Utf8               SourceFile
+  #14 = Utf8               Selsort.java
+  #15 = NameAndType        #4:#5          // "<init>":()V
+  #16 = Utf8               Selsort
+  #17 = Utf8               java/lang/Object
+{
+  Selsort();
+    descriptor: ()V
+    flags:
+    Code:
+      stack=1, locals=1, args_size=1
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return
+      LineNumberTable:
+        line 1: 0
+
+  public static void SelectionSort(int[]);
+    descriptor: ([I)V
+    flags: ACC_PUBLIC, ACC_STATIC
+    Code:
+      stack=4, locals=4, args_size=1
+         0: iconst_0
+         1: istore_1
+         2: iload_1
+         3: aload_0
+         4: arraylength
+         5: if_icmpge     57
+         8: iload_1
+         9: istore_2
+        10: iload_1
+        11: iconst_1
+        12: iadd
+        13: istore_3
+        14: iload_3
+        15: aload_0
+        16: arraylength
+        17: if_icmpge     37
+        20: aload_0
+        21: iload_3
+        22: iaload
+        23: aload_0
+        24: iload_2
+        25: iaload
+        26: if_icmpge     31
+        29: iload_3
+        30: istore_2
+        31: iinc          3, 1
+        34: goto          14
+        37: aload_0
+        38: iload_1
+        39: iaload
+        40: istore_3
+        41: aload_0
+        42: iload_1
+        43: aload_0
+        44: iload_2
+        45: iaload
+        46: iastore
+        47: aload_0
+        48: iload_2
+        49: iload_3
+        50: iastore
+        51: iinc          1, 1
+        54: goto          2
+        57: return
+      LineNumberTable:
+        line 3: 0
+        line 4: 8
+        line 5: 10
+        line 6: 20
+        line 7: 29
+        line 5: 31
+        line 8: 37
+        line 3: 51
+        line 10: 57
+      StackMapTable: number_of_entries = 5
+        frame_type = 252 /* append */
+          offset_delta = 2
+          locals = [ int ]
+        frame_type = 253 /* append */
+          offset_delta = 11
+          locals = [ int, int ]
+        frame_type = 16 /* same */
+        frame_type = 250 /* chop */
+          offset_delta = 5
+        frame_type = 249 /* chop */
+          offset_delta = 19
+
+  public static void main(java.lang.String[]);
+    descriptor: ([Ljava/lang/String;)V
+    flags: ACC_PUBLIC, ACC_STATIC
+    Code:
+      stack=0, locals=1, args_size=1
+         0: return
+      LineNumberTable:
+        line 15: 0
+}
+SourceFile: "Selsort.java"
