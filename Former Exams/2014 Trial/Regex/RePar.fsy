@@ -1,0 +1,42 @@
+﻿%{
+ open Absyn;
+%}
+
+%token <char> CHAR
+
+%token STAR OR
+%token EPS
+%token LPAR RPAR 
+%token EOF
+
+%left EOF EPS              /* lowest precedence  */
+%left STAR
+%left LPAR RPAR
+%left OR                 /* highest precedence  */
+
+
+%start Main
+%type <Absyn.re> Main Re
+
+%%
+
+Main:
+  Re EOF                                { $1                     }
+;
+
+Re:
+    Re OR Re                            { Choice($1, $3)         }
+  | Res                                 { $1                     }
+;
+
+Res:
+    Res ReFinal                         { Seq($1, $2)            }
+  | ReFinal                             { $1                     }
+;
+
+ReFinal:
+    CHAR                                { Char($1)               }
+  | EPS                                 { Eps                    }
+  | ReFinal STAR                        { Star($1)               }
+  | LPAR Re RPAR                        { $2                     }
+;

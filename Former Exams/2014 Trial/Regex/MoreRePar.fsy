@@ -1,0 +1,58 @@
+﻿%{
+ open Absyn;
+%}
+
+%token <char> CHAR
+
+%token QM PLUS
+%token SQLPAR SQRPAR DASH
+%token STAR OR
+%token EPS
+%token LPAR RPAR 
+%token EOF
+
+%left EOF EPS              /* lowest precedence  */
+%left STAR
+%left LPAR RPAR
+%left OR                 /* highest precedence  */
+
+
+%start Main
+%type <Absyn.re> Main Re
+
+%%
+
+Main:
+  Re EOF                                { $1                     }
+;
+
+Re:
+    Re OR Re                            { Choice($1, $3)         }
+  | Res                                 { $1                     }
+;
+
+ResSet:
+    ResSet CHAR                         { Choice($1, Char($2))   }
+  | ResSet EPS                          { Choice($1, Eps)        }
+  | CHAR                                { Char($1)               }
+  | CHAR                                { Eps                    }
+;
+
+Res:
+    Res ReFinal                         { Seq($1, $2)            }
+  | ReFinal                             { $1                     }
+;
+
+Set:
+	Res
+;
+
+ReFinal:
+    CHAR                                { Char($1)               }
+  | EPS                                 { Eps                    }
+  | ReFinal STAR                        { Star($1)               }
+  | ReFinal QSTMK                       { Choice(eps, $2)        }
+  | ReFinal PLUS                        { Seq($1, Star($1))      }
+  | LPAR Re RPAR                        { $2                     }
+  | SQLPAR ResSet SQRPAR                { $2                     }
+;

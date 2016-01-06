@@ -1,0 +1,27 @@
+﻿{
+module MoreReLex
+
+open Microsoft.FSharp.Text.Lexing
+open MoreRePar
+
+let lexemeAsString lexbuf =
+    LexBuffer<char>.LexemeString lexbuf
+}
+
+rule Token = parse
+   | [' ' '\t' '\r']                     { Token lexbuf }
+   | '\n'                                { lexbuf.EndPos <- lexbuf.EndPos.NextLine; Token lexbuf }
+   | ['\'']['a'-'z''A'-'Z''0'-'9']['\''] { CHAR ((lexemeAsString lexbuf).[1]) }
+   | ['\'']['\'']                        { EPS }
+   | 'e'                                 { EPS }
+   | '('                                 { LPAR }
+   | ')'                                 { RPAR }
+   | '*'                                 { STAR }
+   | '|'                                 { OR }
+   | '?'                                 { QSTMK }
+   | '+'                                 { PLUS }
+   | '['                                 { SQLPAR }
+   | ']'                                 { SQRPAR }
+   | '-'                                 { DASH }
+   | eof                                 { EOF }
+   | _                                   { failwith "Lexer error: illegal symbol" }
