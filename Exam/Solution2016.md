@@ -201,6 +201,101 @@ Altså ses det at den endelige type er: int. Der er også overenstemmelse mellem
 
 ### 3.1)
 
+Ændringer i Absyn.fs
+
+    and expr =                                                         
+    | Access of access                 (* x    or  *p    or  a[e]     *)
+    | Assign of access * expr          (* x=e  or  *p=e  or  a[e]=e   *)
+    | Addr of access                   (* &x   or  &*p   or  &a[e]    *)
+    | CstI of int                      (* Constant integer            *)
+    | CstN                             (* Constant nil                *)
+    | CstS of string                   (* Constant string             *)
+    ...
+
+
+Ændringer i CPar.fsy
+
+    AtExprNotAccess:
+          Const                               { CstI $1               }
+        | CSTSTRING                           { CstS $1               }
+        ...
+    ;
+
+Ændringer i Comp.fs
+
+    and cExpr (e : expr) (varEnv : varEnv) (funEnv : funEnv) : instr list = 
+        match e with
+        | Access acc     -> cAccess acc varEnv funEnv @ [LDI] 
+        | Assign(acc, e) -> cAccess acc varEnv funEnv @ cExpr e varEnv funEnv @ [STI]
+        | CstI i         -> [CSTI i]
+        | CstN           -> [NIL]
+        | CstS s         -> [CSTS s]
+
+Ændringer i Machine.fs
+
+    type instr =
+        ...
+        | SETCDR                             (* set second field of cons cell   *)
+        | CSTS of string                     (* add string on the stack         *)
+
+
+    let CODECSTS   = 32;
+    
+    let makelabenv (addr, labenv) instr = 
+        match instr with
+        ...
+        | SETCDR         -> (addr+1, labenv)
+        | CSTS s         -> (addr+(2 + (String.length s)), labenv)
+    
+    let explode s = [for c in s -> int c]
+
+    let rec emitints getlab instr ints = 
+        match instr with
+        ...
+        | SETCDR         -> CODESETCDR :: ints
+        | CSTS s         -> CODECSTS   :: (String.length s) :: ((explode s) @ ints)
+
+
+Ændringer i listmachine.c
+
+    #define STRINGTAG 1
+
+    #define CSTS 32
+
+    void printInstruction(int p[], int pc) {
+        switch (p[pc]) {
+        case CSTI:   printf("CSTI %d", p[pc+1]); break;
+        case CSTS:   printf("CSTS %d", p[pc+1]); break;
+        ...
+        
+    int execcode(int p[], int s[], int iargs[], int iargc, int /* boolean */ trace) {
+            ...
+            case CSTS: {
+                int lenStr = p[pc++];
+                int sizeStr = lenStr + 1; // Extra for zero terminating string, \0.
+                int sizeW = (sizeStr % 4 == 0)?sizeStr/4:(sizeStr/4)+1; // 4 chars per word
+                sizeW = sizeW + 1; // Extra for string length.
+                word* strPtr = allocate(STRINGTAG, sizeW, s, sp);
+                s[++sp] = (int)strPtr;
+                strPtr[1] = lenStr;
+                char* toPtr = (char*)(strPtr+2);
+                for (int i=0; i<lenStr; i++)
+                toPtr[i] = (char) p[pc++];
+                toPtr[lenStr] = '\0'; // Zero terminate string!
+                printf ("The string \"%s\" has now been allocated.\n", toPtr); /* Debug */
+            } break;
+            default:                  
+                printf("Illegal instruction %d at address %d\n", p[pc-1], pc-1);
+                return -1;
+            }
+        }
+    }    
+    
+
+
+Jeg er kommet frem til at CSTS s i makelabenv skal bruge addr + 2 + længden af strengen eftesom at det i opgavebeskrivelsen er nævnt at hvert tegn bruger et ord og at en streng har header der fylder 1 ord og længden af strengen der også fylder 1.
+
+
 
 ### 3.2)
 

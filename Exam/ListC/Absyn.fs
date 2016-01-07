@@ -20,12 +20,12 @@ and expr =
   | Addr of access                   (* &x   or  &*p   or  &a[e]    *)
   | CstI of int                      (* Constant integer            *)
   | CstN                             (* Constant nil                *)
+  | CstS of string                   (* Constant string             *)
   | Prim1 of string * expr           (* Unary primitive operator    *)
   | Prim2 of string * expr * expr    (* Binary primitive operator   *)
   | Andalso of expr * expr           (* Sequential and              *)
   | Orelse of expr * expr            (* Sequential or               *)
   | Call of string * expr list       (* Function call f(...)        *)
-  | CstS of string                   (* Constant string             *)
                                                                    
 and access =                                                       
   | AccVar of string                 (* Variable access        x    *) 

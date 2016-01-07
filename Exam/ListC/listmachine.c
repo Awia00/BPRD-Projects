@@ -128,6 +128,7 @@ word *freelist;
 void printInstruction(int p[], int pc) {
   switch (p[pc]) {
   case CSTI:   printf("CSTI %d", p[pc+1]); break;
+  case CSTS:   printf("CSTS %d", p[pc+1]); break;
   case ADD:    printf("ADD"); break;
   case SUB:    printf("SUB"); break;
   case MUL:    printf("MUL"); break;

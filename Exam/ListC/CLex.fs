@@ -452,6 +452,4 @@ and _fslex_String chars _fslex_state lexbuf =
           )
   | _ -> failwith "String"
 
-# 119 "CLex.fsl"
-
 # 3000000 "CLex.fs"

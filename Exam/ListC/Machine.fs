@@ -104,7 +104,7 @@ let CODECAR    = 28;
 let CODECDR    = 29;
 let CODESETCAR = 30;
 let CODESETCDR = 31;
-let CODECSTS = 32;
+let CODECSTS   = 32;
 
 (* Bytecode emission, first pass: build environment that maps 
    each label to an integer address in the bytecode.
@@ -145,7 +145,7 @@ let makelabenv (addr, labenv) instr =
     | CDR            -> (addr+1, labenv)
     | SETCAR         -> (addr+1, labenv)
     | SETCDR         -> (addr+1, labenv)
-    | CSTS s         -> (addr+(String.length s)/4, labenv)
+    | CSTS s         -> (addr+(2 + (String.length s)), labenv)
 
 (* Bytecode emission, second pass: output bytecode as integers *)
 let explode s = [for c in s -> int c]
