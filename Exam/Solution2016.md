@@ -201,6 +201,7 @@ Altså ses det at den endelige type er: int. Der er også overenstemmelse mellem
 
 ### 3.1)
 
+
 ### 3.2)
 
 

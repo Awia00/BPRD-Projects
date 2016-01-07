@@ -47,6 +47,7 @@ type instr =
   | CDR                                (* get second field of cons cell   *)
   | SETCAR                             (* set first field of cons cell    *)
   | SETCDR                             (* set second field of cons cell   *)
+  | CSTS of string                     (* add string on the stack         *)
 
 (* Generate new distinct labels *)
 
@@ -103,6 +104,7 @@ let CODECAR    = 28;
 let CODECDR    = 29;
 let CODESETCAR = 30;
 let CODESETCDR = 31;
+let CODECSTS = 32;
 
 (* Bytecode emission, first pass: build environment that maps 
    each label to an integer address in the bytecode.
@@ -143,8 +145,10 @@ let makelabenv (addr, labenv) instr =
     | CDR            -> (addr+1, labenv)
     | SETCAR         -> (addr+1, labenv)
     | SETCDR         -> (addr+1, labenv)
+    | CSTS s         -> (addr+(String.length s)/4, labenv)
 
 (* Bytecode emission, second pass: output bytecode as integers *)
+let explode s = [for c in s -> int c]
 
 let rec emitints getlab instr ints = 
     match instr with
@@ -181,6 +185,7 @@ let rec emitints getlab instr ints =
     | CDR            -> CODECDR    :: ints
     | SETCAR         -> CODESETCAR :: ints
     | SETCDR         -> CODESETCDR :: ints
+    | CSTS s         -> CODECSTS   :: (String.length s) :: ((explode s) @ ints)
 
 
 (* Convert instruction list to int list in two passes:
