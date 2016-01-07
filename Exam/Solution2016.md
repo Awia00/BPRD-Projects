@@ -296,9 +296,30 @@ Altså ses det at den endelige type er: int. Der er også overenstemmelse mellem
 Jeg er kommet frem til at CSTS s i makelabenv skal bruge addr + 2 + længden af strengen eftesom at det i opgavebeskrivelsen er nævnt at hvert tegn bruger et ord og at en streng har header der fylder 1 ord og længden af strengen der også fylder 1.
 
 
+Resultatet af kørslen af testprogrammet giver:
+
+    listmachine Opgave3Tests.out
+    The string "Hi there" has now been allocated.
+    The string "Hi there again" has now been allocated.
+    
+    Used   0.000 cpu seconds
+
 
 ### 3.2)
 
+Dette er den abstrakte syntaks der bliver dannet af parseren givet det eksempel der stod i opgaveteksten.
+
+    Prog
+        [Fundec
+            (null,"main",[],
+             Block
+                [Dec (TypD,"s1"); Dec (TypD,"s2");
+                 Stmt (Expr (Assign (AccVar "s1",CstS "Hi there")));
+                 Stmt (Expr (Assign (AccVar "s2",CstS "Hi there again")))])]
+
+De sidste to statements tildeller strengene som CstS værdier, hvilket er forventet.
+
+Note: Jeg blev nød til at flytte min kode over på en linux maskine og compile både mit eksempel med listcc. Det skyldes en bug på windows. Diskussions forums løsningen fra November hjalp kun til at compile selve listmachine.c men ikke at benytte den efterfølgende.
 
 ## Opgave 4
 ----------------------------------------------
