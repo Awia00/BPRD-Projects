@@ -15,13 +15,16 @@
 %token PLUS MINUS TIMES DIV MOD
 %token EQ NE GT LT GE LE
 %token LPAR RPAR 
+%token UPDOP EXMARK REF
 %token EOF
 
 %left ELSE              /* lowest precedence  */
-%left EQ NE 
+%left EQ NE
+%right REF EXMARK
 %nonassoc GT LT GE LE
 %left PLUS MINUS
-%left TIMES DIV MOD 
+%left TIMES DIV MOD
+%left UPDOP
 %nonassoc NOT           /* highest precedence  */
 
 %start Main
@@ -50,11 +53,14 @@ Expr:
   | Expr LT    Expr                     { Prim("<",  $1, $3)     }
   | Expr GE    Expr                     { Prim(">=", $1, $3)     }
   | Expr LE    Expr                     { Prim("<=", $1, $3)     }
+  | Expr UPDOP Expr                     { UpdRef($1, $3)         }
 ;
 
 AtExpr:
     Const                               { $1                     }
   | NAME                                { Var $1                 }
+  | REF Expr                            { Ref $2                 }
+  | EXMARK Expr                         { Deref $2               }
   | LET NAME EQ Expr IN Expr END        { Let($2, $4, $6)        }
   | LET NAME NAME EQ Expr IN Expr END   { Letfun($2, $3, $5, $7) }
   | LPAR Expr RPAR                      { $2                     }

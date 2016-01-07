@@ -2,6 +2,9 @@
 module FunPar
 type token = 
   | EOF
+  | UPDOP
+  | EXMARK
+  | REF
   | LPAR
   | RPAR
   | EQ
@@ -29,6 +32,9 @@ type token =
   | CSTINT of (int)
 type tokenId = 
     | TOKEN_EOF
+    | TOKEN_UPDOP
+    | TOKEN_EXMARK
+    | TOKEN_REF
     | TOKEN_LPAR
     | TOKEN_RPAR
     | TOKEN_EQ
@@ -61,6 +67,7 @@ type nonTerminalId =
     | NONTERM_Main
     | NONTERM_Expr
     | NONTERM_AtExpr
+    | NONTERM_Ref
     | NONTERM_AppExpr
     | NONTERM_Const
 /// This function maps tokens to integer indexes
