@@ -19,6 +19,7 @@ let nl = CstI 10
 %token EQ NE GT LT GE LE
 %token NOT SEQOR SEQAND
 %token LPAR RPAR LBRACE RBRACE LBRACK RBRACK SEMI COMMA ASSIGN AMP
+%token DOTLT DOTGT DOTLE DOTGE DOTEQ DOTNE
 %token EOF
 
 %right ASSIGN             /* lowest precedence */
@@ -133,6 +134,16 @@ ExprNotAccess:
   | Expr LE    Expr                     { Prim2("<=", $1, $3) }
   | Expr SEQAND Expr                    { Andalso($1, $3)     }
   | Expr SEQOR  Expr                    { Orelse($1, $3)      }
+  | Expr Check Expr Check Expr          { Andalso(Prim2($2,$1,$3), Prim2($4,$3,$5)) }
+;
+
+Check:
+    DOTLT                               { "<"                   }
+  | DOTGT                               { ">"                   }
+  | DOTLE                               { "<="                  }
+  | DOTGE                               { ">="                  }
+  | DOTEQ                               { "=="                  }
+  | DOTNE                               { "!="                  }
 ;
 
 AtExprNotAccess:

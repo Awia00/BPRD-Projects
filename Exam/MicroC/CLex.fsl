@@ -65,7 +65,13 @@ rule Token = parse
   | "||"            { SEQOR }                     
   | "&&"            { SEQAND }                     
   | "&"             { AMP }                     
-  | "!"             { NOT }                     
+  | "!"             { NOT }
+  | ".<"            { DOTLT }
+  | ".>"            { DOTGT }
+  | ".<="           { DOTLE }
+  | ".>="           { DOTGE }
+  | ".=="           { DOTEQ }
+  | ".!="           { DOTNE }                     
   | '('             { LPAR }
   | ')'             { RPAR }
   | '{'             { LBRACE }

@@ -2,6 +2,12 @@
 module CPar
 type token = 
   | EOF
+  | DOTLT
+  | DOTGT
+  | DOTLE
+  | DOTGE
+  | DOTEQ
+  | DOTNE
   | LPAR
   | RPAR
   | LBRACE
@@ -42,6 +48,12 @@ type token =
   | CSTBOOL of (int)
 type tokenId = 
     | TOKEN_EOF
+    | TOKEN_DOTLT
+    | TOKEN_DOTGT
+    | TOKEN_DOTLE
+    | TOKEN_DOTGE
+    | TOKEN_DOTEQ
+    | TOKEN_DOTNE
     | TOKEN_LPAR
     | TOKEN_RPAR
     | TOKEN_LBRACE
@@ -99,6 +111,7 @@ type nonTerminalId =
     | NONTERM_StmtU
     | NONTERM_Expr
     | NONTERM_ExprNotAccess
+    | NONTERM_Check
     | NONTERM_AtExprNotAccess
     | NONTERM_Access
     | NONTERM_Exprs

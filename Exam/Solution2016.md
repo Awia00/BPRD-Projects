@@ -1,4 +1,4 @@
-# Januar 07-08 2016 BPRD Eksamen
+# Programmer som data (BPRD-Autumn 2015) - 2016 Januar
 ### Anders Wind Steffensen: awis@itu.dk
 
 _Jeg erklærer hermed at jeg selv har lavet hele denne eksamensbesvarelse uden hjælp fra andre._
@@ -190,7 +190,6 @@ Egne eksempler fra sektion 2.4
 
 Det udarbejdede typetræ kan ses på figur x
 
-
 - Typen c = int
 - Typen b = c ref
 - Typen a = int
@@ -201,7 +200,38 @@ Altså ses det at den endelige type er: int. Der er også overenstemmelse mellem
 ----------------------------------------------
 
 ### 1.1)
+void main() { print 2 .< 3 .< 4; print 3 .< 2 .== 2; print 3 .> 2 .== 2; print (3 .> 2 .== 2) == (3 .> 1 .== 1); print (3 .> 2 .== 2) == 1; }
 
+Ændringer i CLex.fsI
+
+    rule Token = parse
+        ...                   
+        | "!"             { NOT }
+        | ".<"            { DOTLT }
+        | ".>"            { DOTGT }
+        | ".<="           { DOTLE }
+        | ".>="           { DOTGE }
+        | ".=="           { DOTEQ }
+        | ".!="           { DOTNE }                     
+        | '('             { LPAR }
+        ...
+
+Ændringer i CPar.fsy
+
+    ExprNotAccess:
+        ...
+        | Expr Check Expr Check Expr          { Andalso(Prim2($2,$1,$3), Prim2($4,$3,$5)) }
+    ;
+
+    Check:
+          DOTLT                               { "<"                   }
+        | DOTGT                               { ">"                   }
+        | DOTLE                               { "<="                  }
+        | DOTGE                               { ">="                  }
+        | DOTEQ                               { "=="                  }
+        | DOTNE                               { "!="                  }
+    ;
+    
 ### 1.2)
 
 
@@ -209,6 +239,7 @@ Altså ses det at den endelige type er: int. Der er også overenstemmelse mellem
 ----------------------------------------------
 
 ### 1.1)
+
 
 ### 1.2)
 
