@@ -26,12 +26,13 @@ let nl = CstI 10
 %nonassoc PRINT
 %left SEQOR
 %left SEQAND
-%left EQ NE 
-%nonassoc GT LT GE LE
+%left EQ NE DOTEQ DOTNE
+%nonassoc GT LT GE LE DOTGT DOTLT DOTLE DOTGE
 %left PLUS MINUS
 %left TIMES DIV MOD 
 %nonassoc NOT AMP 
 %nonassoc LBRACK          /* highest precedence  */
+
 
 %start Main
 %type <Absyn.program> Main 

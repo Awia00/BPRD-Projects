@@ -9,14 +9,14 @@ _Jeg erklærer hermed at jeg selv har lavet hele denne eksamensbesvarelse uden h
 ----------------------------------------------
 ### 1.1)
 
-- kls
-- khs
-- kvs
-- klhvs
-- kvhls
-- kllls
-- khhlls
-- khvvvhhs
+- *kls*
+- *khs*
+- *kvs*
+- *klhvs*
+- *kvhls*
+- *kllls*
+- *khhlls*
+- *khvvvhhs*
 
 Udtrykket matcher sprog som starter med k. Efter k skal et vilkårligt antal på mindst 1, af enten l, v eller h optræde. Sproget skal afsluttes med et s.
 
@@ -89,9 +89,9 @@ Den matcher på alle de strenge der er givet i opgave beskrivelsen, samt undgår
 	                           | _ -> failwith "Updref did not get a refvalue"
 
 Der er altså tilføjet 3 nye matches. Disse matches håndterer hver af de nye expr typer.
-Ref e: returnerer en RefVal med resultatet af den evaluerede e i det nuværende environment refereret til med en F# reference.
-Deref e: evaluerer e i det nuværende environment og matcher det med en RefVal. I dette tilfælde benyttes F# deref notationen !ref til at returnere værdien i RefVal uden at det er en reference.
-UpdRed (e1, e2): Først tjekkes det at e1 er en RefVal type ligesom i Deref. Herefter evalueres e2 i det nye environment, og værdien i e1 referencen updateres med F# update ref notation :=.
+- `Ref e`: returnerer en `RefVal` med resultatet af den evaluerede `e` i det nuværende environment refereret til med en F# reference.
+- `Deref e`: evaluerer `e` i det nuværende environment og matcher det med en `RefVal`. I dette tilfælde benyttes F# deref notationen `!ref` til at returnere værdien i `RefVal` uden at det er en reference.
+- `UpdRed (e1, e2)`: Først tjekkes det at `e1` er en `RefVal` type ligesom i `Deref`. Herefter evalueres `e2` i det nye environment, og værdien i `e1` referencen updateres med F# update ref notation `:=`.
 
 ### 2.4)
 
@@ -226,6 +226,17 @@ Altså ses det at den endelige type er: int. Der er også overenstemmelse mellem
 
 Ændringer i CPar.fsy
 
+    %right ASSIGN             /* lowest precedence */
+    %nonassoc PRINT
+    %left SEQOR
+    %left SEQAND
+    %left EQ NE DOTEQ DOTNE
+    %nonassoc GT LT GE LE DOTGT DOTLT DOTLE DOTGE
+    %left PLUS MINUS
+    %left TIMES DIV MOD 
+    %nonassoc NOT AMP 
+    %nonassoc LBRACK          /* highest precedence  */
+
     ExprNotAccess:
         ...
         | Expr Check Expr Check Expr          { Andalso(Prim2($2,$1,$3), Prim2($4,$3,$5)) }
@@ -255,32 +266,33 @@ Jeg har lavet testkoden Opgave4-2-Tests.c
         print 2 .< 3 .< 4; 
         print 3 .< 2 .== 2; 
         print 3 .> 2 .== 2; 
-        print (3 .> 2 .== - 2) == (3 .> 1 .== 1); 
+        print (3 .> 2 .== 2) == (3 .> 1 .== 1); 
         print (3 .> 2 .== 2) == 1; 
         // prints 1 0 1 1 1
         
         println; // True true
         print -1 .< 2 .> -2;  
         print 1 .== 1 .!= 2;
-        print (1+4) .>= (5-1) .<= (100-10); 
-        // prints 1 1 1
+        print 1+4 .>= 5-1 .<= 100-10;
+        print (1 .== 1 .== 1) .== 1 .< 3;
+        // prints 1 1 1 1
         
         println; // false false
         print -1 .> 2 .< -2;  
         print 1 .!= 1 .== 2;
-        print (1+4) .<= (5-1) .>= (100-10); 
+        print 1+4 .<= 5-1 .>= 100-10; 
         // prints 0 0 0
         
         println; // true false
         print -1 .< 2 .< -2;  
         print 1 .== 1 .== 2;
-        print (1+4) .>= (5-1) .>= (100-10); 
+        print 1+4 .>= 5-1 .>= 100-10; 
         // prints 0 0 0
         
         println; // false true
         print -1 .> 2 .> -2;  
         print 1 .!= 1 .!= 2;
-        print (1+4) .<= (5-1) .<= (100-10); 
+        print 1+4 .<= 5-1 .<= 100-10; 
         // prints 0 0 0
         
         int x;
@@ -307,4 +319,5 @@ og så kørt det i javamaskinen.
     javac Machine.java
     java Machine tests.out
 
-Hvilket giver de rigtige resultater.
+Hvilket giver de rigtige resultater. 
+Note: linjen "print (1 .== 1 .== 1) .== 1 .< 3;" er lidt et misbrug af typer eftersom at vi benytter os af at `true` svarer til `1` og derfor er det ligemed 1.
