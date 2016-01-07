@@ -15,14 +15,15 @@
 %token PLUS MINUS TIMES DIV MOD
 %token EQ NE GT LT GE LE
 %token LPAR RPAR 
+%token COMMA FST SND
 %token EOF
 
 %left ELSE              /* lowest precedence  */
 %left EQ NE 
 %nonassoc GT LT GE LE
 %left PLUS MINUS
-%left TIMES DIV MOD 
-%nonassoc NOT           /* highest precedence  */
+%left TIMES DIV MOD
+%nonassoc NOT COMMA           /* highest precedence  */
 
 %start Main
 %type <Absyn.expr> Main Expr AtExpr Const
@@ -50,6 +51,8 @@ Expr:
   | Expr LT    Expr                     { Prim("<",  $1, $3)     }
   | Expr GE    Expr                     { Prim(">=", $1, $3)     }
   | Expr LE    Expr                     { Prim("<=", $1, $3)     }
+  | FST Pair                            { Fst($2)                }
+  | SND Pair                            { Snd($2)                }
 ;
 
 AtExpr:
@@ -60,6 +63,10 @@ AtExpr:
   | LPAR Expr RPAR                      { $2                     }
 ;
 
+Pair:
+    LPAR Expr COMMA Expr RPAR           { Pair($2, $4)           }
+;
+
 AppExpr:
     AtExpr AtExpr                       { Call($1, $2)           }
   | AppExpr AtExpr                      { Call($1, $2)           }
@@ -68,4 +75,5 @@ AppExpr:
 Const:
     CSTINT                              { CstI($1)               }
   | CSTBOOL                             { CstB($1)               }
+  | Pair                                { $1                     }
 ;

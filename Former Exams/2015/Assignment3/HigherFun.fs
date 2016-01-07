@@ -29,6 +29,7 @@ let rec lookup env x =
 
 type value = 
   | Int of int
+  | PairValue of value * value
   | Closure of string * string * expr * value env       (* (f, x, fBody, fDeclEnv) *)
 
 let rec eval (e : expr) (env : value env) : value =
@@ -65,7 +66,11 @@ let rec eval (e : expr) (env : value env) : value =
         let xVal = eval eArg env
         let fBodyEnv = (x, xVal) :: (f, fClosure) :: fDeclEnv
         in eval fBody fBodyEnv
-      | _ -> failwith "eval Call: not a function";;
+      | _ -> failwith "eval Call: not a function"
+    | Pair(e1,e2)         -> PairValue(eval e1 env, eval e2 env)
+    | Fst(Pair(e1,e2))    -> eval e1 env
+    | Snd(Pair(e1,e2))    -> eval e2 env
+    | _     -> failwith "unknown primitive or wrong type"
 
 (* Evaluate in empty environment: program must have no free variables: *)
 
