@@ -199,8 +199,16 @@ Altså ses det at den endelige type er: int. Der er også overenstemmelse mellem
 ## Opgave 3
 ----------------------------------------------
 
-### 1.1)
-void main() { print 2 .< 3 .< 4; print 3 .< 2 .== 2; print 3 .> 2 .== 2; print (3 .> 2 .== 2) == (3 .> 1 .== 1); print (3 .> 2 .== 2) == 1; }
+### 3.1)
+
+### 3.2)
+
+
+## Opgave 4
+----------------------------------------------
+
+### 4.1)
+
 
 Ændringer i CLex.fsI
 
@@ -232,14 +240,71 @@ void main() { print 2 .< 3 .< 4; print 3 .< 2 .== 2; print 3 .> 2 .== 2; print (
         | DOTNE                               { "!="                  }
     ;
     
-### 1.2)
 
+    
+Løsningen består altså af en række nye tokens tilsvarende de forskellige boolske operatorer. 
+Derudover har parseren fået en ny gruppe: CHECK som returnerer en string med deres tilsvarende operator. 
+Denne kan hefter ligges ind i en Prim2 da denne tager imod string notation af operatorerne.
+I ExprNotAccess gruppen er der tilføjet et enkelt match som er i formen af interval check. Den første og midterste expr bliver kædet sammen til en prim2 med den første check operator. Den midterste og sidste expr bliver kædet sammen af den anden check operator.
+Et Andalso binder de to primgrupper sammen.
 
-## Opgave 4
-----------------------------------------------
+### 4.2)
+Jeg har lavet testkoden Opgave4-2-Tests.c
 
-### 1.1)
+    void main() {
+        print 2 .< 3 .< 4; 
+        print 3 .< 2 .== 2; 
+        print 3 .> 2 .== 2; 
+        print (3 .> 2 .== - 2) == (3 .> 1 .== 1); 
+        print (3 .> 2 .== 2) == 1; 
+        // prints 1 0 1 1 1
+        
+        println; // True true
+        print -1 .< 2 .> -2;  
+        print 1 .== 1 .!= 2;
+        print (1+4) .>= (5-1) .<= (100-10); 
+        // prints 1 1 1
+        
+        println; // false false
+        print -1 .> 2 .< -2;  
+        print 1 .!= 1 .== 2;
+        print (1+4) .<= (5-1) .>= (100-10); 
+        // prints 0 0 0
+        
+        println; // true false
+        print -1 .< 2 .< -2;  
+        print 1 .== 1 .== 2;
+        print (1+4) .>= (5-1) .>= (100-10); 
+        // prints 0 0 0
+        
+        println; // false true
+        print -1 .> 2 .> -2;  
+        print 1 .!= 1 .!= 2;
+        print (1+4) .<= (5-1) .<= (100-10); 
+        // prints 0 0 0
+        
+        int x;
+        x = 5;
+        println; // True true
+        print x .== x .== x;  
+        print x .== 5 .== x;
+        print 5 .== x .== 5;
+        // prints 1 1 1
+    }
 
+For at køre det har jeg: 
 
-### 1.2)
+    fslex --unicode CLex.fsl
+    fsyacc --module CPar CPar.fsy
+    fsi -r %HOMEDRIVE%%HOMEPATH%/FsYacc/Bin/FsLexYacc.Runtime.dll Absyn.fs CPar.fs CLex.fs Parse.fs Machine.fs Comp.fs ParseAndComp.fs"
 
+    open ParseAndComp;;
+    compileToFile (fromFile "Opgave4-2-Tests.c") "tests.out";;
+    #q;;
+    
+og så kørt det i javamaskinen.
+
+    javac Machine.java
+    java Machine tests.out
+
+Hvilket giver de rigtige resultater.
