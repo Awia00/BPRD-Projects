@@ -1,0 +1,222 @@
+<p>#Januar 07-08 2016 BPRD Eksamen</p>
+<p>###Anders Wind Steffensen: awis@itu.dk</p>
+<p><em>Jeg erklærer hermed at jeg selv har lavet hele denne eksamensbesvarelse uden hjælp fra andre.</em></p>
+<h2 id="opgave-1">Opgave 1</h2>
+<hr>
+<h3 id="1-1-">1.1)</h3>
+<ul>
+<li>kls</li>
+<li>khs</li>
+<li>kvs</li>
+<li>klhvs</li>
+<li>kvhls</li>
+<li>kllls</li>
+<li>khhlls</li>
+<li>khvvvhhs</li>
+</ul>
+<p>Udtrykket matcher sprog som starter med k. Efter k skal et vilkårligt antal på mindst 1, af enten l, v eller h optræde. Sproget skal afsluttes med et s.</p>
+<h3 id="1-2-">1.2)</h3>
+<p>Jeg har baseret løsningen ud fra metoden beskrevet i Basics of Compiler Design. Muligvis kan man ikke lave denne ræcise opbygning for sammenkædede | konstruktioner, og de kunne være blevet splitet ud således at a|b hvor b = c|d. Jeg har taget udgangspunkt i at + svarer overens til: aa*</p>
+<p>Den udarbejdede NFA kan ses på figur x.</p>
+<h3 id="1-3-">1.3)</h3>
+<p>Jeg har benyttet mig af algoritemn beskrevet i Basics of Compiler Design. Algoritmens resultat kan ses i tabellen herunder</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>k</th>
+<th>l</th>
+<th>v</th>
+<th>h</th>
+<th>s</th>
+<th>NFA states</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S1</td>
+<td>S2</td>
+<td>Ø</td>
+<td>Ø</td>
+<td>Ø</td>
+<td>Ø</td>
+<td>1</td>
+</tr>
+<tr>
+<td>S2</td>
+<td>Ø</td>
+<td>S3</td>
+<td>S3</td>
+<td>S3</td>
+<td>Ø</td>
+<td>2, 3, 4, 5</td>
+</tr>
+<tr>
+<td>S3</td>
+<td>Ø</td>
+<td>S4</td>
+<td>S4</td>
+<td>S4</td>
+<td>S5</td>
+<td>6, 7, 8, 9, 10, 11, 13</td>
+</tr>
+<tr>
+<td>S4</td>
+<td>Ø</td>
+<td>S4</td>
+<td>S4</td>
+<td>S4</td>
+<td>S5</td>
+<td>7, 8, 9, 10, 11, 12, 13</td>
+</tr>
+<tr>
+<td>S5</td>
+<td>Ø</td>
+<td>Ø</td>
+<td>Ø</td>
+<td>Ø</td>
+<td>Ø</td>
+<td>14</td>
+</tr>
+</tbody>
+</table>
+<p>På figur x ses den udarbejdede DFA.</p>
+<h3 id="1-4-">1.4)</h3>
+<p>Jeg har udarbejdet følgende regex: (l|hl|vl)+ 
+Den matcher på alle de strenge der er givet i opgave beskrivelsen, samt undgår at matche på de: lv, lh, lvv, lvh, lhv og lhh.</p>
+<h2 id="opgave-2">Opgave 2</h2>
+<hr>
+<h3 id="2-1-">2.1)</h3>
+<p>Ændringer i Absyn:</p>
+<pre><code>type expr = 
+  | CstI of int
+  | CstB of bool
+  | Var of string
+  | Let of string * expr * expr
+  | Prim of string * expr * expr
+  | If of expr * expr * expr
+  | Letfun of string * string * expr * expr    (* (f, x, fBody, letBody) *)
+  | Call of expr * expr
+  | Ref of expr
+  | Deref of expr
+  | UpdRef of expr * expr
+</code></pre><h3 id="2-2-">2.2)</h3>
+<p>Ændringer i HigherFun
+    type value = 
+      | Int of int
+      | Closure of string <em> string </em> expr <em> value env       (</em> (f, x, fBody, fDeclEnv) *)
+      | Refvalue of value ref</p>
+<h3 id="2-3-">2.3)</h3>
+<p>Ændringer i HigherFun</p>
+<pre><code>let rec eval (e : expr) (env : value env) : value =
+    match e with
+    ...
+    | Ref e             -&gt; RefVal (ref (eval e env))
+    | Deref e           -&gt; let value = eval e env
+                           match value with
+                           | RefVal refv -&gt; !refv
+                           | _ -&gt; failwith &quot;Deref did not get a refvalue&quot;
+    | UpdRef (e1,e2)    -&gt; let value1 = eval e1 env
+                           match value1 with
+                           | RefVal refv -&gt; let value2 = eval e2 env
+                                            refv := value2
+                                            value2
+                           | _ -&gt; failwith &quot;Updref did not get a refvalue&quot;
+</code></pre><p>Der er altså tilføjet 3 nye matches. Disse matches håndterer hver af de nye expr typer.
+Ref e: returnerer en RefVal med resultatet af den evaluerede e i det nuværende environment refereret til med en F# reference.
+Deref e: evaluerer e i det nuværende environment og matcher det med en RefVal. I dette tilfælde benyttes F# deref notationen !ref til at returnere værdien i RefVal uden at det er en reference.
+UpdRed (e1, e2): Først tjekkes det at e1 er en RefVal type ligesom i Deref. Herefter evalueres e2 i det nye environment, og værdien i e1 referencen updateres med F# update ref notation :=.</p>
+<h3 id="2-4-">2.4)</h3>
+<pre><code>&gt; run (Letfun (&quot;f&quot;, &quot;x&quot;, Deref(Var &quot;x&quot;), Call(Var &quot;f&quot;, Ref(CstI 1))));;
+val it : HigherFun.value = Int 1
+
+&gt; run (Deref(Ref(UpdRef(Ref(UpdRef(Ref(CstI 1),CstI 2)),CstI 3))));;
+val it : HigherFun.value = Int 3
+
+&gt; run (Let(&quot;x&quot;, Ref(CstI 1), UpdRef(Var &quot;x&quot;, CstI 2)));;
+val it : HigherFun.value = Int 2
+
+&gt; run (Prim(&quot;=&quot;, CstI 2, Deref(Ref(Prim(&quot;+&quot;, CstI 1, CstI 1)))));;
+val it : HigherFun.value = Int 1
+</code></pre><h3 id="2-5-">2.5)</h3>
+<p>Ændringer i FunLex.fsl</p>
+<pre><code>let keyword s =
+    match s with
+    ...
+    | &quot;ref&quot;   -&gt; REF
+    | _       -&gt; NAME s
+
+rule Token = parse
+    ...
+    | &#39;!&#39;             { EXMARK }
+    | &quot;:=&quot;            { UPDOP }
+    | eof             { EOF }
+    | _               { failwith &quot;Lexer error: illegal symbol&quot; }
+</code></pre><p>Ændringer i FunLex.fsy</p>
+<pre><code>%token UPDOP EXMARK REF
+
+%left ELSE              /* lowest precedence  */
+%left EQ NE UPDOP
+%right REF EXMARK
+%nonassoc GT LT GE LE
+%left PLUS MINUS
+%left TIMES DIV MOD
+%nonassoc NOT           /* highest precedence  */
+
+Expr:
+...
+    | Ref UPDOP Expr                      { UpdRef($1, $3)         }
+;
+
+AtExpr:
+      Const                               { $1                     }
+    | NAME                                { Var $1                 }
+    | REF Expr                            { Ref $2                 }
+    | EXMARK Expr                         { Deref $2               }
+    | LET NAME EQ Expr IN Expr END        { Let($2, $4, $6)        }
+    | LET NAME NAME EQ Expr IN Expr END   { Letfun($2, $3, $5, $7) }
+    | LPAR Expr RPAR                      { $2                     }
+;
+</code></pre><h3 id="2-6-">2.6)</h3>
+<p>Eksempler fra sektion 2.3</p>
+<pre><code>&gt; fromString &quot;let x = ref 1 in if !x=1 then x:= 2 else 42 end&quot;;;
+val it : Absyn.expr = Let (&quot;x&quot;,Ref (CstI 1), If (Prim (&quot;=&quot;,Deref (Var &quot;x&quot;),CstI 1),UpdRef (Var &quot;x&quot;,CstI 2),CstI 42)
+&gt; run it;;
+val it : HigherFun.value = Int 2
+
+&gt; fromString &quot;let x = ref 2 in (x:=3) + !x end&quot;;;
+val it : Absyn.expr = Let (&quot;x&quot;,Ref (CstI 2),Prim (&quot;+&quot;,UpdRef (Var &quot;x&quot;,CstI 3),Deref (Var &quot;x&quot;)))
+&gt; run it;;
+val it : HigherFun.value = Int 6
+</code></pre><p>Egne eksempler fra sektion 2.4</p>
+<pre><code>&gt; fromString &quot;let f x = !x in f ref 1 end&quot;;;
+val it : Absyn.expr = Letfun (&quot;f&quot;,&quot;x&quot;,Deref (Var &quot;x&quot;),Call (Var &quot;f&quot;,Ref (CstI 1)))
+&gt; run it;;
+val it : HigherFun.value = Int 1
+
+&gt; fromString &quot;!(ref ((ref ((ref 1):=2)):=3))&quot;;;
+val it : Absyn.expr = Deref (Ref (UpdRef (Ref (UpdRef (Ref (CstI 1),CstI 2)),CstI 3)))
+&gt; run it;;
+val it : HigherFun.value = Int 3
+
+&gt; fromString &quot;let x = ref 1 in x:=2 end&quot;;;
+val it : Absyn.expr = Let (&quot;x&quot;,Ref (CstI 1),UpdRef (Var &quot;x&quot;,CstI 2))
+&gt; run it;;
+val it : HigherFun.value = Int 2
+
+&gt; fromString &quot;2=!(ref (1+1))&quot;;;
+val it : Absyn.expr = Prim (&quot;=&quot;,CstI 2,Deref (Ref (Prim (&quot;+&quot;,CstI 1,CstI 1))))
+&gt; run it;;
+val it : HigherFun.value = Int 1
+</code></pre><h3 id="2-7-">2.7)</h3>
+<p>Det udarbejdede typetræ kan ses på figur x</p>
+<ul>
+<li>Typen c = int</li>
+<li>Typen b = c ref</li>
+<li>Typen a = int</li>
+</ul>
+<p>Altså ses det at den endelige type er: int. Der er også overenstemmelse mellem de værdier der udledes af regel 1 og de værdier x bliver slået op til at være.</p>
+<h2 id="opgave-3">Opgave 3</h2>
+<hr>
+<h2 id="opgave-4">Opgave 4</h2>
+<hr>

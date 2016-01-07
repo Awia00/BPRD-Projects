@@ -1,5 +1,5 @@
-#Januar 07-08 2016 BPRD Eksamen
-###Anders Wind Steffensen: awis@itu.dk
+# Januar 07-08 2016 BPRD Eksamen
+### Anders Wind Steffensen: awis@itu.dk
 
 _Jeg erklærer hermed at jeg selv har lavet hele denne eksamensbesvarelse uden hjælp fra andre._
 
@@ -128,12 +128,11 @@ UpdRed (e1, e2): Først tjekkes det at e1 er en RefVal type ligesom i Deref. Her
     %token UPDOP EXMARK REF
 
     %left ELSE              /* lowest precedence  */
-    %left EQ NE
+    %left EQ NE UPDOP
     %right REF EXMARK
     %nonassoc GT LT GE LE
     %left PLUS MINUS
     %left TIMES DIV MOD
-    %left UPDOP
     %nonassoc NOT           /* highest precedence  */
 
     Expr:
@@ -160,7 +159,7 @@ Eksempler fra sektion 2.3
     > run it;;
     val it : HigherFun.value = Int 2
 
-    > fromString "let x = ref 2 in x:=3 + !x end";;
+    > fromString "let x = ref 2 in (x:=3) + !x end";;
     val it : Absyn.expr = Let ("x",Ref (CstI 2),Prim ("+",UpdRef (Var "x",CstI 3),Deref (Var "x")))
     > run it;;
     val it : HigherFun.value = Int 6
@@ -189,13 +188,27 @@ Egne eksempler fra sektion 2.4
 
 ### 2.7)
 
+Det udarbejdede typetræ kan ses på figur x
 
+
+- Typen c = int
+- Typen b = c ref
+- Typen a = int
+
+Altså ses det at den endelige type er: int. Der er også overenstemmelse mellem de værdier der udledes af regel 1 og de værdier x bliver slået op til at være.
 
 ## Opgave 3
 ----------------------------------------------
 
+### 1.1)
+
+### 1.2)
 
 
 ## Opgave 4
 ----------------------------------------------
+
+### 1.1)
+
+### 1.2)
 
