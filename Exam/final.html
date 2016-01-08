@@ -1,23 +1,25 @@
-<p>#Januar 07-08 2016 BPRD Eksamen</p>
-<p>###Anders Wind Steffensen: awis@itu.dk</p>
+<h1 id="programmer-som-data-bprd-autumn-2015-2016-januar">Programmer som data (BPRD-Autumn 2015) - 2016 Januar</h1>
+<h3 id="anders-wind-steffensen-awis-itu-dk">Anders Wind Steffensen: awis@itu.dk</h3>
 <p><em>Jeg erklærer hermed at jeg selv har lavet hele denne eksamensbesvarelse uden hjælp fra andre.</em></p>
 <h2 id="opgave-1">Opgave 1</h2>
 <hr>
 <h3 id="1-1-">1.1)</h3>
 <ul>
-<li>kls</li>
-<li>khs</li>
-<li>kvs</li>
-<li>klhvs</li>
-<li>kvhls</li>
-<li>kllls</li>
-<li>khhlls</li>
-<li>khvvvhhs</li>
+<li><em>kls</em></li>
+<li><em>khs</em></li>
+<li><em>kvs</em></li>
+<li><em>klhvs</em></li>
+<li><em>kvhls</em></li>
+<li><em>kllls</em></li>
+<li><em>khhlls</em></li>
+<li><em>khvvvhhs</em></li>
 </ul>
 <p>Udtrykket matcher sprog som starter med k. Efter k skal et vilkårligt antal på mindst 1, af enten l, v eller h optræde. Sproget skal afsluttes med et s.</p>
 <h3 id="1-2-">1.2)</h3>
-<p>Jeg har baseret løsningen ud fra metoden beskrevet i Basics of Compiler Design. Muligvis kan man ikke lave denne ræcise opbygning for sammenkædede | konstruktioner, og de kunne være blevet splitet ud således at a|b hvor b = c|d. Jeg har taget udgangspunkt i at + svarer overens til: aa*</p>
-<p>Den udarbejdede NFA kan ses på figur x.</p>
+<p>Jeg har baseret løsningen ud fra metoden beskrevet i Basics of Compiler Design. Muligvis kan man ikke lave denne ræcise opbygning for sammenkædede <code>|</code> konstruktioner, og de kunne være blevet splitet ud således at a|b hvor b = c|d. Jeg har taget udgangspunkt i at + svarer overens til: <code>aa*</code></p>
+<p>Den udarbejdede NFA kan ses på figuren herunder.</p>
+<p><img src="Opgave1-NFA.png" alt="NFA over det regulære udtryk k(l|v|h)+s"></p>
+<p>Som det kan ses på figuren er startstaten <strong>1</strong> og acceptstaten <strong>14</strong>. </p>
 <h3 id="1-3-">1.3)</h3>
 <p>Jeg har benyttet mig af algoritemn beskrevet i Basics of Compiler Design. Algoritmens resultat kan ses i tabellen herunder</p>
 <table>
@@ -80,7 +82,8 @@
 </tr>
 </tbody>
 </table>
-<p>På figur x ses den udarbejdede DFA.</p>
+<p>På figuren herunder ses den udarbejdede DFA.</p>
+<p><img src="Opgave1-DFA.png" alt="DFA over det regulære udtryk k(l|v|h)+s"></p>
 <h3 id="1-4-">1.4)</h3>
 <p>Jeg har udarbejdet følgende regex: (l|hl|vl)+ 
 Den matcher på alle de strenge der er givet i opgave beskrivelsen, samt undgår at matche på de: lv, lh, lvv, lvh, lhv og lhh.</p>
@@ -122,10 +125,12 @@ Den matcher på alle de strenge der er givet i opgave beskrivelsen, samt undgår
                                             refv := value2
                                             value2
                            | _ -&gt; failwith &quot;Updref did not get a refvalue&quot;
-</code></pre><p>Der er altså tilføjet 3 nye matches. Disse matches håndterer hver af de nye expr typer.
-Ref e: returnerer en RefVal med resultatet af den evaluerede e i det nuværende environment refereret til med en F# reference.
-Deref e: evaluerer e i det nuværende environment og matcher det med en RefVal. I dette tilfælde benyttes F# deref notationen !ref til at returnere værdien i RefVal uden at det er en reference.
-UpdRed (e1, e2): Først tjekkes det at e1 er en RefVal type ligesom i Deref. Herefter evalueres e2 i det nye environment, og værdien i e1 referencen updateres med F# update ref notation :=.</p>
+</code></pre><p>Der er altså tilføjet 3 nye matches. Disse matches håndterer hver af de nye expr typer.</p>
+<ul>
+<li><code>Ref e</code>: returnerer en <code>RefVal</code> med resultatet af den evaluerede <code>e</code> i det nuværende environment refereret til med en F# reference.</li>
+<li><code>Deref e</code>: evaluerer <code>e</code> i det nuværende environment og matcher det med en <code>RefVal</code>. I dette tilfælde benyttes F# deref notationen <code>!ref</code> til at returnere værdien i <code>RefVal</code> uden at det er en reference.</li>
+<li><code>UpdRed (e1, e2)</code>: Først tjekkes det at <code>e1</code> er en <code>RefVal</code> type ligesom i <code>Deref</code>. Herefter evalueres <code>e2</code> i det nye environment, og værdien i <code>e1</code> referencen updateres med F# update ref notation <code>:=</code>.</li>
+</ul>
 <h3 id="2-4-">2.4)</h3>
 <pre><code>&gt; run (Letfun (&quot;f&quot;, &quot;x&quot;, Deref(Var &quot;x&quot;), Call(Var &quot;f&quot;, Ref(CstI 1))));;
 val it : HigherFun.value = Int 1
@@ -209,14 +214,212 @@ val it : Absyn.expr = Prim (&quot;=&quot;,CstI 2,Deref (Ref (Prim (&quot;+&quot;
 &gt; run it;;
 val it : HigherFun.value = Int 1
 </code></pre><h3 id="2-7-">2.7)</h3>
-<p>Det udarbejdede typetræ kan ses på figur x</p>
+<p>Det udarbejdede typetræ kan ses på figuren herunder</p>
+<p><img src="Opgave2-TypeTree.jpg" alt="Udarbejdet typetree"></p>
 <ul>
-<li>Typen c = int</li>
-<li>Typen b = c ref</li>
-<li>Typen a = int</li>
+<li>Typen t1 = int</li>
+<li>Typen t2 = c ref = int ref</li>
+<li>Typen t3 = int</li>
 </ul>
-<p>Altså ses det at den endelige type er: int. Der er også overenstemmelse mellem de værdier der udledes af regel 1 og de værdier x bliver slået op til at være.</p>
+<p>Altså ses det at den endelige type er: int. Der er også overenstemmelse mellem de værdier der udledes af regel 1 og de værdier x bliver slået op til at være med regel p3.
+Jeg har ikke sat int værdierne ind på alle pladserne for at vise processen, men de værdier der står i punkterne herover kunne sættes direkte ind på deres respektive pladser.</p>
 <h2 id="opgave-3">Opgave 3</h2>
 <hr>
+<h3 id="3-1-">3.1)</h3>
+<p>Ændringer i Absyn.fs</p>
+<pre><code>and expr =                                                         
+| Access of access                 (* x    or  *p    or  a[e]     *)
+| Assign of access * expr          (* x=e  or  *p=e  or  a[e]=e   *)
+| Addr of access                   (* &amp;x   or  &amp;*p   or  &amp;a[e]    *)
+| CstI of int                      (* Constant integer            *)
+| CstN                             (* Constant nil                *)
+| CstS of string                   (* Constant string             *)
+...
+</code></pre><p>Ændringer i CPar.fsy</p>
+<pre><code>AtExprNotAccess:
+      Const                               { CstI $1               }
+    | CSTSTRING                           { CstS $1               }
+    ...
+;
+</code></pre><p>Ændringer i Comp.fs</p>
+<pre><code>and cExpr (e : expr) (varEnv : varEnv) (funEnv : funEnv) : instr list = 
+    match e with
+    | Access acc     -&gt; cAccess acc varEnv funEnv @ [LDI] 
+    | Assign(acc, e) -&gt; cAccess acc varEnv funEnv @ cExpr e varEnv funEnv @ [STI]
+    | CstI i         -&gt; [CSTI i]
+    | CstN           -&gt; [NIL]
+    | CstS s         -&gt; [CSTS s]
+</code></pre><p>Ændringer i Machine.fs</p>
+<pre><code>type instr =
+    ...
+    | SETCDR                             (* set second field of cons cell   *)
+    | CSTS of string                     (* add string on the stack         *)
+
+
+let CODECSTS   = 32;
+
+let makelabenv (addr, labenv) instr = 
+    match instr with
+    ...
+    | SETCDR         -&gt; (addr+1, labenv)
+    | CSTS s         -&gt; (addr+(2 + (String.length s)), labenv)
+
+let explode s = [for c in s -&gt; int c]
+
+let rec emitints getlab instr ints = 
+    match instr with
+    ...
+    | SETCDR         -&gt; CODESETCDR :: ints
+    | CSTS s         -&gt; CODECSTS   :: (String.length s) :: ((explode s) @ ints)
+</code></pre><p>Ændringer i listmachine.c</p>
+<pre><code>#define STRINGTAG 1
+
+#define CSTS 32
+
+void printInstruction(int p[], int pc) {
+    switch (p[pc]) {
+    case CSTI:   printf(&quot;CSTI %d&quot;, p[pc+1]); break;
+    case CSTS:   printf(&quot;CSTS %d&quot;, p[pc+1]); break;
+    ...
+
+int execcode(int p[], int s[], int iargs[], int iargc, int /* boolean */ trace) {
+        ...
+        case CSTS: {
+            int lenStr = p[pc++];
+            int sizeStr = lenStr + 1; // Extra for zero terminating string, \0.
+            int sizeW = (sizeStr % 4 == 0)?sizeStr/4:(sizeStr/4)+1; // 4 chars per word
+            sizeW = sizeW + 1; // Extra for string length.
+            word* strPtr = allocate(STRINGTAG, sizeW, s, sp);
+            s[++sp] = (int)strPtr;
+            strPtr[1] = lenStr;
+            char* toPtr = (char*)(strPtr+2);
+            for (int i=0; i&lt;lenStr; i++)
+            toPtr[i] = (char) p[pc++];
+            toPtr[lenStr] = &#39;\0&#39;; // Zero terminate string!
+            printf (&quot;The string \&quot;%s\&quot; has now been allocated.\n&quot;, toPtr); /* Debug */
+        } break;
+        default:                  
+            printf(&quot;Illegal instruction %d at address %d\n&quot;, p[pc-1], pc-1);
+            return -1;
+        }
+    }
+}    
+</code></pre><p>Jeg er kommet frem til at CSTS s i makelabenv skal bruge addr + 2 + længden af strengen eftesom at det i opgavebeskrivelsen er nævnt at hvert tegn bruger et ord og at en streng har header der fylder 1 ord og længden af strengen der også fylder 1.</p>
+<p>Resultatet af kørslen af testprogrammet giver:</p>
+<pre><code>listmachine Opgave3Tests.out
+The string &quot;Hi there&quot; has now been allocated.
+The string &quot;Hi there again&quot; has now been allocated.
+
+Used   0.000 cpu seconds
+</code></pre><h3 id="3-2-">3.2)</h3>
+<p>Dette er den abstrakte syntaks der bliver dannet af parseren givet det eksempel der stod i opgaveteksten.</p>
+<pre><code>Prog
+    [Fundec
+        (null,&quot;main&quot;,[],
+         Block
+            [Dec (TypD,&quot;s1&quot;); Dec (TypD,&quot;s2&quot;);
+             Stmt (Expr (Assign (AccVar &quot;s1&quot;,CstS &quot;Hi there&quot;)));
+             Stmt (Expr (Assign (AccVar &quot;s2&quot;,CstS &quot;Hi there again&quot;)))])]
+</code></pre><p>De sidste to statements tildeller strengene som CstS værdier, hvilket er forventet.</p>
+<p>Note: Jeg blev nød til at flytte min kode over på en linux maskine og compile både mit eksempel med listcc. Det skyldes en bug på windows. Diskussions forums løsningen fra November hjalp kun til at compile selve listmachine.c men ikke at benytte den efterfølgende.</p>
 <h2 id="opgave-4">Opgave 4</h2>
 <hr>
+<h3 id="4-1-">4.1)</h3>
+<p>Ændringer i CLex.fsI</p>
+<pre><code>rule Token = parse
+    ...                   
+    | &quot;!&quot;             { NOT }
+    | &quot;.&lt;&quot;            { DOTLT }
+    | &quot;.&gt;&quot;            { DOTGT }
+    | &quot;.&lt;=&quot;           { DOTLE }
+    | &quot;.&gt;=&quot;           { DOTGE }
+    | &quot;.==&quot;           { DOTEQ }
+    | &quot;.!=&quot;           { DOTNE }                     
+    | &#39;(&#39;             { LPAR }
+    ...
+</code></pre><p>Ændringer i CPar.fsy</p>
+<pre><code>%right ASSIGN             /* lowest precedence */
+%nonassoc PRINT
+%left SEQOR
+%left SEQAND
+%left EQ NE DOTEQ DOTNE
+%nonassoc GT LT GE LE DOTGT DOTLT DOTLE DOTGE
+%left PLUS MINUS
+%left TIMES DIV MOD 
+%nonassoc NOT AMP 
+%nonassoc LBRACK          /* highest precedence  */
+
+ExprNotAccess:
+    ...
+    | Expr Check Expr Check Expr          { Andalso(Prim2($2,$1,$3), Prim2($4,$3,$5)) }
+;
+
+Check:
+      DOTLT                               { &quot;&lt;&quot;                   }
+    | DOTGT                               { &quot;&gt;&quot;                   }
+    | DOTLE                               { &quot;&lt;=&quot;                  }
+    | DOTGE                               { &quot;&gt;=&quot;                  }
+    | DOTEQ                               { &quot;==&quot;                  }
+    | DOTNE                               { &quot;!=&quot;                  }
+;
+</code></pre><p>Løsningen består altså af en række nye tokens tilsvarende de forskellige boolske operatorer. 
+Derudover har parseren fået en ny gruppe: CHECK som returnerer en string med deres tilsvarende operator. 
+Denne kan hefter ligges ind i en Prim2 da denne tager imod string notation af operatorerne.
+I ExprNotAccess gruppen er der tilføjet et enkelt match som er i formen af interval check. Den første og midterste expr bliver kædet sammen til en prim2 med den første check operator. Den midterste og sidste expr bliver kædet sammen af den anden check operator.
+Et Andalso binder de to primgrupper sammen.</p>
+<h3 id="4-2-">4.2)</h3>
+<p>Jeg har lavet testkoden Opgave4-2-Tests.c</p>
+<pre><code>void main() {
+    print 2 .&lt; 3 .&lt; 4; 
+    print 3 .&lt; 2 .== 2; 
+    print 3 .&gt; 2 .== 2; 
+    print (3 .&gt; 2 .== 2) == (3 .&gt; 1 .== 1); 
+    print (3 .&gt; 2 .== 2) == 1; 
+    // prints 1 0 1 1 1
+
+    println; // True true
+    print -1 .&lt; 2 .&gt; -2;  
+    print 1 .== 1 .!= 2;
+    print 1+4 .&gt;= 5-1 .&lt;= 100-10;
+    print (1 .== 1 .== 1) .== 1 .&lt; 3;
+    // prints 1 1 1 1
+
+    println; // false false
+    print -1 .&gt; 2 .&lt; -2;  
+    print 1 .!= 1 .== 2;
+    print 1+4 .&lt;= 5-1 .&gt;= 100-10; 
+    // prints 0 0 0
+
+    println; // true false
+    print -1 .&lt; 2 .&lt; -2;  
+    print 1 .== 1 .== 2;
+    print 1+4 .&gt;= 5-1 .&gt;= 100-10; 
+    // prints 0 0 0
+
+    println; // false true
+    print -1 .&gt; 2 .&gt; -2;  
+    print 1 .!= 1 .!= 2;
+    print 1+4 .&lt;= 5-1 .&lt;= 100-10; 
+    // prints 0 0 0
+
+    int x;
+    x = 5;
+    println; // True true
+    print x .== x .== x;  
+    print x .== 5 .== x;
+    print 5 .== x .== 5;
+    // prints 1 1 1
+}
+</code></pre><p>For at køre det har jeg: </p>
+<pre><code>fslex --unicode CLex.fsl
+fsyacc --module CPar CPar.fsy
+fsi -r %HOMEDRIVE%%HOMEPATH%/FsYacc/Bin/FsLexYacc.Runtime.dll Absyn.fs CPar.fs CLex.fs Parse.fs Machine.fs Comp.fs ParseAndComp.fs&quot;
+
+open ParseAndComp;;
+compileToFile (fromFile &quot;Opgave4-2-Tests.c&quot;) &quot;tests.out&quot;;;
+#q;;
+</code></pre><p>og så kørt det i javamaskinen.</p>
+<pre><code>javac Machine.java
+java Machine tests.out
+</code></pre><p>Hvilket giver de rigtige resultater. 
+Note: linjen &quot;print (1 .== 1 .== 1) .== 1 .&lt; 3;&quot; er lidt et misbrug af typer eftersom at vi benytter os af at <code>true</code> svarer til <code>1</code> og derfor er det ligemed 1.</p>

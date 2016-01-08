@@ -4,6 +4,9 @@
 _Jeg erklærer hermed at jeg selv har lavet hele denne eksamensbesvarelse uden hjælp fra andre._
 
 
+[DFA]: Opgave1-DFA.png
+[NFA]: Opgave1-NFA.png
+[TypeTree]: Opgave2-TypeTree.jpg
 
 ## Opgave 1
 ----------------------------------------------
@@ -21,9 +24,14 @@ _Jeg erklærer hermed at jeg selv har lavet hele denne eksamensbesvarelse uden h
 Udtrykket matcher sprog som starter med k. Efter k skal et vilkårligt antal på mindst 1, af enten l, v eller h optræde. Sproget skal afsluttes med et s.
 
 ### 1.2)
-Jeg har baseret løsningen ud fra metoden beskrevet i Basics of Compiler Design. Muligvis kan man ikke lave denne ræcise opbygning for sammenkædede | konstruktioner, og de kunne være blevet splitet ud således at a|b hvor b = c|d. Jeg har taget udgangspunkt i at + svarer overens til: aa*
+Jeg har baseret løsningen ud fra metoden beskrevet i Basics of Compiler Design. Muligvis kan man ikke lave denne ræcise opbygning for sammenkædede `|` konstruktioner, og de kunne være blevet splitet ud således at a|b hvor b = c|d. 
+Jeg har taget udgangspunkt i at `a+` svarer overens til: `aa*`
 
-Den udarbejdede NFA kan ses på figur x.
+Den udarbejdede NFA kan ses på figuren herunder.
+
+![NFA][NFA]
+
+Som det kan ses på figuren er startstaten **1** og acceptstaten **14**.
 
 ### 1.3)
 Jeg har benyttet mig af algoritemn beskrevet i Basics of Compiler Design. Algoritmens resultat kan ses i tabellen herunder
@@ -36,11 +44,13 @@ Jeg har benyttet mig af algoritemn beskrevet i Basics of Compiler Design. Algori
 | S4    	| Ø  	| S4 	| S4 	| S4 	| S5 	| 7, 8, 9, 10, 11, 12, 13 	|
 | S5    	| Ø  	| Ø  	| Ø  	| Ø  	| Ø  	| 14                      	|
 
-På figur x ses den udarbejdede DFA.
+På figuren herunder ses den udarbejdede DFA.
+
+![DFA][DFA]
 
 ### 1.4)
 
-Jeg har udarbejdet følgende regex: (l|hl|vl)+ 
+Jeg har udarbejdet følgende regex: `(l|hl|vl)+`
 Den matcher på alle de strenge der er givet i opgave beskrivelsen, samt undgår at matche på de: lv, lh, lvv, lvh, lhv og lhh.
 
 
@@ -49,7 +59,7 @@ Den matcher på alle de strenge der er givet i opgave beskrivelsen, samt undgår
 ### 2.1)
 Ændringer i Absyn:
 
-	type expr = 
+	type expr =
 	  | CstI of int
 	  | CstB of bool
 	  | Var of string
@@ -65,7 +75,7 @@ Den matcher på alle de strenge der er givet i opgave beskrivelsen, samt undgår
 ### 2.2)
 
 Ændringer i HigherFun
-	type value = 
+	type value =
 	  | Int of int
 	  | Closure of string * string * expr * value env       (* (f, x, fBody, fDeclEnv) *)
 	  | Refvalue of value ref
@@ -163,7 +173,7 @@ Eksempler fra sektion 2.3
     val it : Absyn.expr = Let ("x",Ref (CstI 2),Prim ("+",UpdRef (Var "x",CstI 3),Deref (Var "x")))
     > run it;;
     val it : HigherFun.value = Int 6
-    
+
 Egne eksempler fra sektion 2.4
 
     > fromString "let f x = !x in f ref 1 end";;
@@ -188,13 +198,16 @@ Egne eksempler fra sektion 2.4
 
 ### 2.7)
 
-Det udarbejdede typetræ kan ses på figur x
+Det udarbejdede typetræ kan ses på figuren herunder
 
-- Typen c = int
-- Typen b = c ref
-- Typen a = int
+![Udarbejdet typetree][TypeTree]
 
-Altså ses det at den endelige type er: int. Der er også overenstemmelse mellem de værdier der udledes af regel 1 og de værdier x bliver slået op til at være.
+- Typen t1 = int
+- Typen t2 = c ref = int ref
+- Typen t3 = int
+
+Altså ses det at den endelige type er: int. Der er også overenstemmelse mellem de værdier der udledes af regel 1 og de værdier x bliver slået op til at være med regel p3.
+Jeg har ikke sat int værdierne ind på alle pladserne for at vise processen, men de værdier der står i punkterne herover kunne sættes direkte ind på deres respektive pladser.
 
 ## Opgave 3
 ----------------------------------------------
@@ -223,9 +236,9 @@ Altså ses det at den endelige type er: int. Der er også overenstemmelse mellem
 
 Ændringer i Comp.fs
 
-    and cExpr (e : expr) (varEnv : varEnv) (funEnv : funEnv) : instr list = 
+    and cExpr (e : expr) (varEnv : varEnv) (funEnv : funEnv) : instr list =
         match e with
-        | Access acc     -> cAccess acc varEnv funEnv @ [LDI] 
+        | Access acc     -> cAccess acc varEnv funEnv @ [LDI]
         | Assign(acc, e) -> cAccess acc varEnv funEnv @ cExpr e varEnv funEnv @ [STI]
         | CstI i         -> [CSTI i]
         | CstN           -> [NIL]
@@ -240,16 +253,16 @@ Altså ses det at den endelige type er: int. Der er også overenstemmelse mellem
 
 
     let CODECSTS   = 32;
-    
-    let makelabenv (addr, labenv) instr = 
+
+    let makelabenv (addr, labenv) instr =
         match instr with
         ...
         | SETCDR         -> (addr+1, labenv)
         | CSTS s         -> (addr+(2 + (String.length s)), labenv)
-    
+
     let explode s = [for c in s -> int c]
 
-    let rec emitints getlab instr ints = 
+    let rec emitints getlab instr ints =
         match instr with
         ...
         | SETCDR         -> CODESETCDR :: ints
@@ -267,7 +280,7 @@ Altså ses det at den endelige type er: int. Der er også overenstemmelse mellem
         case CSTI:   printf("CSTI %d", p[pc+1]); break;
         case CSTS:   printf("CSTS %d", p[pc+1]); break;
         ...
-        
+
     int execcode(int p[], int s[], int iargs[], int iargc, int /* boolean */ trace) {
             ...
             case CSTS: {
@@ -290,7 +303,7 @@ Altså ses det at den endelige type er: int. Der er også overenstemmelse mellem
             }
         }
     }    
-    
+
 
 
 Jeg er kommet frem til at CSTS s i makelabenv skal bruge addr + 2 + længden af strengen eftesom at det i opgavebeskrivelsen er nævnt at hvert tegn bruger et ord og at en streng har header der fylder 1 ord og længden af strengen der også fylder 1.
@@ -301,7 +314,7 @@ Resultatet af kørslen af testprogrammet giver:
     listmachine Opgave3Tests.out
     The string "Hi there" has now been allocated.
     The string "Hi there again" has now been allocated.
-    
+
     Used   0.000 cpu seconds
 
 
@@ -350,8 +363,8 @@ Note: Jeg blev nød til at flytte min kode over på en linux maskine og compile 
     %left EQ NE DOTEQ DOTNE
     %nonassoc GT LT GE LE DOTGT DOTLT DOTLE DOTGE
     %left PLUS MINUS
-    %left TIMES DIV MOD 
-    %nonassoc NOT AMP 
+    %left TIMES DIV MOD
+    %nonassoc NOT AMP
     %nonassoc LBRACK          /* highest precedence  */
 
     ExprNotAccess:
@@ -367,11 +380,11 @@ Note: Jeg blev nød til at flytte min kode over på en linux maskine og compile 
         | DOTEQ                               { "=="                  }
         | DOTNE                               { "!="                  }
     ;
-    
 
-    
-Løsningen består altså af en række nye tokens tilsvarende de forskellige boolske operatorer. 
-Derudover har parseren fået en ny gruppe: CHECK som returnerer en string med deres tilsvarende operator. 
+
+
+Løsningen består altså af en række nye tokens tilsvarende de forskellige boolske operatorer.
+Derudover har parseren fået en ny gruppe: CHECK som returnerer en string med deres tilsvarende operator.
 Denne kan hefter ligges ind i en Prim2 da denne tager imod string notation af operatorerne.
 I ExprNotAccess gruppen er der tilføjet et enkelt match som er i formen af interval check. Den første og midterste expr bliver kædet sammen til en prim2 med den første check operator. Den midterste og sidste expr bliver kædet sammen af den anden check operator.
 Et Andalso binder de to primgrupper sammen.
@@ -380,38 +393,38 @@ Et Andalso binder de to primgrupper sammen.
 Jeg har lavet testkoden Opgave4-2-Tests.c
 
     void main() {
-        print 2 .< 3 .< 4; 
-        print 3 .< 2 .== 2; 
-        print 3 .> 2 .== 2; 
-        print (3 .> 2 .== 2) == (3 .> 1 .== 1); 
-        print (3 .> 2 .== 2) == 1; 
+        print 2 .< 3 .< 4;
+        print 3 .< 2 .== 2;
+        print 3 .> 2 .== 2;
+        print (3 .> 2 .== 2) == (3 .> 1 .== 1);
+        print (3 .> 2 .== 2) == 1;
         // prints 1 0 1 1 1
-        
+
         println; // True true
         print -1 .< 2 .> -2;  
         print 1 .== 1 .!= 2;
         print 1+4 .>= 5-1 .<= 100-10;
         print (1 .== 1 .== 1) .== 1 .< 3;
         // prints 1 1 1 1
-        
+
         println; // false false
         print -1 .> 2 .< -2;  
         print 1 .!= 1 .== 2;
-        print 1+4 .<= 5-1 .>= 100-10; 
+        print 1+4 .<= 5-1 .>= 100-10;
         // prints 0 0 0
-        
+
         println; // true false
         print -1 .< 2 .< -2;  
         print 1 .== 1 .== 2;
-        print 1+4 .>= 5-1 .>= 100-10; 
+        print 1+4 .>= 5-1 .>= 100-10;
         // prints 0 0 0
-        
+
         println; // false true
         print -1 .> 2 .> -2;  
         print 1 .!= 1 .!= 2;
-        print 1+4 .<= 5-1 .<= 100-10; 
+        print 1+4 .<= 5-1 .<= 100-10;
         // prints 0 0 0
-        
+
         int x;
         x = 5;
         println; // True true
@@ -421,7 +434,7 @@ Jeg har lavet testkoden Opgave4-2-Tests.c
         // prints 1 1 1
     }
 
-For at køre det har jeg: 
+For at køre det har jeg:
 
     fslex --unicode CLex.fsl
     fsyacc --module CPar CPar.fsy
@@ -430,11 +443,11 @@ For at køre det har jeg:
     open ParseAndComp;;
     compileToFile (fromFile "Opgave4-2-Tests.c") "tests.out";;
     #q;;
-    
+
 og så kørt det i javamaskinen.
 
     javac Machine.java
     java Machine tests.out
 
-Hvilket giver de rigtige resultater. 
+Hvilket giver de rigtige resultater.
 Note: linjen "print (1 .== 1 .== 1) .== 1 .< 3;" er lidt et misbrug af typer eftersom at vi benytter os af at `true` svarer til `1` og derfor er det ligemed 1.
