@@ -1,4 +1,4 @@
-# Programmer som data (BPRD-Autumn 2015) - 2016 Januar
+# Programmer som data (BPRD-Autumn 2015) - Eksamen januar 2016
 ### Anders Wind Steffensen: awis@itu.dk
 
 _Jeg erklærer hermed at jeg selv har lavet hele denne eksamensbesvarelse uden hjælp fra andre._
@@ -21,11 +21,10 @@ _Jeg erklærer hermed at jeg selv har lavet hele denne eksamensbesvarelse uden h
 - *khhlls*
 - *khvvvhhs*
 
-Udtrykket matcher sprog som starter med k. Efter k skal et vilkårligt antal på mindst 1, af enten l, v eller h optræde. Sproget skal afsluttes med et s.
+Udtrykket matcher sprog som starter med *k*. Efterfulgt af *k* skal der være én eller flere optrædelser (i vilkårlig orden), af enten *l*, *v* eller *h*. Sproget skal afsluttes med et *s*.
 
 ### 1.2)
-Jeg har baseret løsningen ud fra metoden beskrevet i Basics of Compiler Design. Muligvis kan man ikke lave denne ræcise opbygning for sammenkædede `|` konstruktioner, og de kunne være blevet splitet ud således at a|b hvor b = c|d. 
-Jeg har taget udgangspunkt i at `a+` svarer overens til: `aa*`
+Jeg har baseret løsningen ud fra metoden beskrevet i Basics of Compiler Design. Muligvis kan man ikke lave denne præcise opbygning for sammenkædede *|* konstruktioner, men at de altså skulle have været splitet ud således at man havde formen: *a|b* hvor *b = c|d*. Jeg har taget udgangspunkt i at *a+* svarer overens til: *aa**
 
 Den udarbejdede NFA kan ses på figuren herunder.
 
@@ -33,6 +32,9 @@ Den udarbejdede NFA kan ses på figuren herunder.
 
 Som det kan ses på figuren er startstaten **1** og acceptstaten **14**.
 
+<br>
+<br>
+<br>
 ### 1.3)
 Jeg har benyttet mig af algoritemn beskrevet i Basics of Compiler Design. Algoritmens resultat kan ses i tabellen herunder
 
@@ -42,16 +44,20 @@ Jeg har benyttet mig af algoritemn beskrevet i Basics of Compiler Design. Algori
 | S2    	| Ø  	| S3 	| S3 	| S3 	| Ø  	| 2, 3, 4, 5              	|
 | S3    	| Ø  	| S4 	| S4 	| S4 	| S5 	| 6, 7, 8, 9, 10, 11, 13  	|
 | S4    	| Ø  	| S4 	| S4 	| S4 	| S5 	| 7, 8, 9, 10, 11, 12, 13 	|
-| S5    	| Ø  	| Ø  	| Ø  	| Ø  	| Ø  	| 14                      	|
+| S5    	| Ø  	| Ø  	| Ø  	| Ø  	| Ø  	| <u>14</u>               	|
 
 På figuren herunder ses den udarbejdede DFA.
 
 ![DFA][DFA]
 
+Som det kan ses på figuren er startstaten **S1** og acceptstaten **S5**.
+
 ### 1.4)
 
 Jeg har udarbejdet følgende regex: `(l|hl|vl)+`
-Den matcher på alle de strenge der er givet i opgave beskrivelsen, samt undgår at matche på de: lv, lh, lvv, lvh, lhv og lhh.
+
+Den matcher på alle de strenge der er givet i opgave beskrivelsen, samt undgår at matche på de: *lv*, *lh*, *lvv*, *lvh*, *lhv* og *lhh*.
+Eftersom at den har 3 elementer inde i sit repiterede element vil der per iteration være 3 i n'nde strenge der matcher.
 
 
 ## Opgave 2
@@ -74,14 +80,15 @@ Den matcher på alle de strenge der er givet i opgave beskrivelsen, samt undgår
 
 ### 2.2)
 
-Ændringer i HigherFun
+Ændringer i HigherFun:
+
 	type value =
 	  | Int of int
 	  | Closure of string * string * expr * value env       (* (f, x, fBody, fDeclEnv) *)
 	  | Refvalue of value ref
 
 ### 2.3)
-Ændringer i HigherFun
+Ændringer i HigherFun:
 
 	let rec eval (e : expr) (env : value env) : value =
 	    match e with
@@ -99,9 +106,10 @@ Den matcher på alle de strenge der er givet i opgave beskrivelsen, samt undgår
 	                           | _ -> failwith "Updref did not get a refvalue"
 
 Der er altså tilføjet 3 nye matches. Disse matches håndterer hver af de nye expr typer.
-- `Ref e`: returnerer en `RefVal` med resultatet af den evaluerede `e` i det nuværende environment refereret til med en F# reference.
-- `Deref e`: evaluerer `e` i det nuværende environment og matcher det med en `RefVal`. I dette tilfælde benyttes F# deref notationen `!ref` til at returnere værdien i `RefVal` uden at det er en reference.
-- `UpdRed (e1, e2)`: Først tjekkes det at `e1` er en `RefVal` type ligesom i `Deref`. Herefter evalueres `e2` i det nye environment, og værdien i `e1` referencen updateres med F# update ref notation `:=`.
+- `Ref e`: returnerer en `RefVal` med resultatet af den evaluerede `e` i det nuværende environment `env` refereret til med F# reference notation.
+- `Deref e`: evaluerer `e` i det nuværende environment `env` og matcher det med en `RefVal`. I dette tilfælde benyttes F# deref notationen `!ref` til at returnere værdien i `RefVal` uden at det er en reference. Hvis `e` ikke bliver evalueret til en `RefVal` fejler den `eval` 
+- `UpdRed (e1, e2)`: Først tjekkes det at `e1` er en `RefVal` type ligesom i `Deref`. Herefter evalueres `e2` i environment `env`, og reference værdien af resultatet af det evaluerede `e1`, updateres med F# update ref notation `:=` til resultat af det evaluerede `e2`. Hvis `e1` ikke bliver evalueret til en `RefVal` fejler den `eval`.
+
 
 ### 2.4)
 
@@ -118,7 +126,7 @@ Der er altså tilføjet 3 nye matches. Disse matches håndterer hver af de nye e
     val it : HigherFun.value = Int 1
 
 ### 2.5)
-Ændringer i FunLex.fsl
+Ændringer i FunLex.fsl:
 
     let keyword s =
         match s with
@@ -133,7 +141,8 @@ Der er altså tilføjet 3 nye matches. Disse matches håndterer hver af de nye e
         | eof             { EOF }
         | _               { failwith "Lexer error: illegal symbol" }
 
-Ændringer i FunLex.fsy
+
+Ændringer i FunLex.fsy:
 
     %token UPDOP EXMARK REF
 
@@ -147,7 +156,7 @@ Der er altså tilføjet 3 nye matches. Disse matches håndterer hver af de nye e
 
     Expr:
     ...
-        | Ref UPDOP Expr                      { UpdRef($1, $3)         }
+        | Expr UPDOP Expr                      { UpdRef($1, $3)         }
     ;
 
     AtExpr:
@@ -155,14 +164,21 @@ Der er altså tilføjet 3 nye matches. Disse matches håndterer hver af de nye e
         | NAME                                { Var $1                 }
         | REF Expr                            { Ref $2                 }
         | EXMARK Expr                         { Deref $2               }
+        | Expr UPDOP Expr                     { UpdRef($1, $3)         }
         | LET NAME EQ Expr IN Expr END        { Let($2, $4, $6)        }
         | LET NAME NAME EQ Expr IN Expr END   { Letfun($2, $3, $5, $7) }
         | LPAR Expr RPAR                      { $2                     }
     ;
 
+
+Som det kan ses er der tilføjet i lexeren 3 nye matches. `ref` til REF token, `!` til EXMARK og `:=` til UPDOP. Disse er også oprettet i parser specifikationen. REF og EXMARK er højreassociative eftersom de ligger sig op af det udtryk der står til højre for dem. UPDOP derimod fungerer som EQ og er venstreassociativ.
+- I `Expr` bliver `UpdRef` "mapped". Den kræver at der er en Expr før og efter update operatoren og dermed kan matche på `(e1):=(e2)`.
+- I `AtExpr` bliver `Ref` "mapped". Den kræver at den har en expr eftersig således at den kan være på formen `ref (e)`.
+- I `AtExpr` bliver `Deref` "mapped". Den kræver at den har en expr eftersig således at den kan være på formen `Deref (e)`.
+
 ### 2.6)
 
-Eksempler fra sektion 2.3
+Eksempler fra sektion 2.3:
 
     > fromString "let x = ref 1 in if !x=1 then x:= 2 else 42 end";;
     val it : Absyn.expr = Let ("x",Ref (CstI 1), If (Prim ("=",Deref (Var "x"),CstI 1),UpdRef (Var "x",CstI 2),CstI 42)
@@ -174,7 +190,7 @@ Eksempler fra sektion 2.3
     > run it;;
     val it : HigherFun.value = Int 6
 
-Egne eksempler fra sektion 2.4
+Egne eksempler fra sektion 2.4:
 
     > fromString "let f x = !x in f ref 1 end";;
     val it : Absyn.expr = Letfun ("f","x",Deref (Var "x"),Call (Var "f",Ref (CstI 1)))
@@ -202,19 +218,18 @@ Det udarbejdede typetræ kan ses på figuren herunder
 
 ![Udarbejdet typetree][TypeTree]
 
-- Typen t1 = int
-- Typen t2 = c ref = int ref
-- Typen t3 = int
+- Typen *t1* = `int`
+- Typen *t2* (x's type) = `t3 ref` = `int ref`
+- Typen *t3* = `int`
 
-Altså ses det at den endelige type er: int. Der er også overenstemmelse mellem de værdier der udledes af regel 1 og de værdier x bliver slået op til at være med regel p3.
-Jeg har ikke sat int værdierne ind på alle pladserne for at vise processen, men de værdier der står i punkterne herover kunne sættes direkte ind på deres respektive pladser.
+Altså ses det at den endelige type er: `int`. Der er også overenstemmelse mellem de værdier der udledes af regel p1 og de værdier x bliver slået op til at være med regel p3. Jeg har ikke sat type værdierne ind på alle pladserne, men de værdier der står i punkterne herover kunne sættes direkte ind på deres respektive pladser. Ved reglerne p1, p4 er det blevet evalueret at *t1*, og *t3* typen var int. Ved "ref" reglen kunne jeg udlede at *t2* var af typen "*t3* ref". Reglen p3 blev brugt til at slå "x"s type op i *p*, hvori x var fastsat til typen *t2*.
 
 ## Opgave 3
 ----------------------------------------------
 
 ### 3.1)
 
-Ændringer i Absyn.fs
+Ændringer i Absyn.fs:
 
     and expr =                                                         
     | Access of access                 (* x    or  *p    or  a[e]     *)
@@ -226,7 +241,7 @@ Jeg har ikke sat int værdierne ind på alle pladserne for at vise processen, me
     ...
 
 
-Ændringer i CPar.fsy
+Ændringer i CPar.fsy:
 
     AtExprNotAccess:
           Const                               { CstI $1               }
@@ -234,7 +249,7 @@ Jeg har ikke sat int værdierne ind på alle pladserne for at vise processen, me
         ...
     ;
 
-Ændringer i Comp.fs
+Ændringer i Comp.fs:
 
     and cExpr (e : expr) (varEnv : varEnv) (funEnv : funEnv) : instr list =
         match e with
@@ -268,18 +283,11 @@ Jeg har ikke sat int værdierne ind på alle pladserne for at vise processen, me
         | SETCDR         -> CODESETCDR :: ints
         | CSTS s         -> CODECSTS   :: (String.length s) :: ((explode s) @ ints)
 
-
 Ændringer i listmachine.c
 
     #define STRINGTAG 1
 
     #define CSTS 32
-
-    void printInstruction(int p[], int pc) {
-        switch (p[pc]) {
-        case CSTI:   printf("CSTI %d", p[pc+1]); break;
-        case CSTS:   printf("CSTS %d", p[pc+1]); break;
-        ...
 
     int execcode(int p[], int s[], int iargs[], int iargc, int /* boolean */ trace) {
             ...
@@ -305,11 +313,9 @@ Jeg har ikke sat int værdierne ind på alle pladserne for at vise processen, me
     }    
 
 
+\> Jeg er kommet frem til at `CSTS s` i makelabenv skal bruge: *addr + 2 + længden af strengen* antal ord instruktioner, eftesom at det i opgavebeskrivelsen er nævnt at hvert tegn bruger et ord og at en streng har header der fylder 1 ord og længden af strengen der også fylder 1 ord. Ud over det der står i opgavebeskrivelsen har jeg tilføjet linjerne `let CODECSTS   = 32;` og `#define CSTS 32` i henholdsvis Machine.fs og listmachine.c. Uden dette havde compileren ikke en måde at oversætte instruktionerne. En streng vil altså af lexeren laves om til token `CSTS` af typen string. Parseren vil herefter matche det og lave det om til typen `CstS s` fra Absyn hvor s er strengen. Compileren laver denne type om til instruktionen `CSTS s` hvor s er strengen. Denne vil herefter blive lavet om til stakkode og i sidste ende bytekode der kan køre i listmaskinen.
 
-Jeg er kommet frem til at CSTS s i makelabenv skal bruge addr + 2 + længden af strengen eftesom at det i opgavebeskrivelsen er nævnt at hvert tegn bruger et ord og at en streng har header der fylder 1 ord og længden af strengen der også fylder 1.
-
-
-Resultatet af kørslen af testprogrammet giver:
+Resultatet af kørslen af testprogrammet givet i opgavebeskrivelsen giver det forventede resultat:
 
     listmachine Opgave3Tests.out
     The string "Hi there" has now been allocated.
@@ -317,8 +323,21 @@ Resultatet af kørslen af testprogrammet giver:
 
     Used   0.000 cpu seconds
 
-
 ### 3.2)
+
+For at skaffe den abstrakte syntax har jeg modificeret parseren: parse.fs
+
+    let fromFile (filename : string) =
+        use reader = new StreamReader(filename)
+        let lexbuf = (*Lexing.*)LexBuffer<char>.FromTextReader reader
+        try
+            let result = CPar.Main CLex.Token lexbuf
+            printf "%a" result
+            result
+        with
+            | exn -> let pos = lexbuf.EndPos
+                failwithf "%s in file %s near line %d, column %d\n"
+                    (exn.Message) filename (pos.Line+1) pos.Column
 
 Dette er den abstrakte syntaks der bliver dannet af parseren givet det eksempel der stod i opgaveteksten.
 
@@ -330,9 +349,11 @@ Dette er den abstrakte syntaks der bliver dannet af parseren givet det eksempel 
                  Stmt (Expr (Assign (AccVar "s1",CstS "Hi there")));
                  Stmt (Expr (Assign (AccVar "s2",CstS "Hi there again")))])]
 
-De sidste to statements tildeller strengene som CstS værdier, hvilket er forventet.
+De sidste to statements, som er de nye der er tilføjet, er en `CstS` type med en streng som parameter. Dette passer overens med den kode der er lavet. `CstS` ligger inde i en `Assign`, med variablerne *s1* og *s2*.
 
-Note: Jeg blev nød til at flytte min kode over på en linux maskine og compile både mit eksempel med listcc. Det skyldes en bug på windows. Diskussions forums løsningen fra November hjalp kun til at compile selve listmachine.c men ikke at benytte den efterfølgende.
+Altså svarer `Stmt (Expr (Assign (AccVar "s1",CstS "Hi there")))` til `s1 = "Hi there";` og `Stmt (Expr (Assign (AccVar "s2",CstS "Hi there again")))` svarer til `s2 = "Hi there again;"`. `Dec (TypD,"s1");` og `Dec (TypD,"s2");` svarer til `dynamic s1;` og `dynamic s2;` hvilket også er forventet. Alle disse statements og Declerations er inde i en block som tilsammen udgør hele `void main()` metodens krop.
+
+*Note til opgave 3: Jeg blev nød til at flytte min kode over på en MAC maskine og compile mit eksempel med listcc. Det skyldes en bug på Windows som gør at man ikke kan bruge listcc til at tage et program (.lc) uden at en exception opstår (Method not found ...). Diskussion-forum's løsningen fra November hjalp kun til at compile selve listmachine.c men ikke at benytte den efterfølgende.*
 
 ## Opgave 4
 ----------------------------------------------
@@ -384,13 +405,10 @@ Note: Jeg blev nød til at flytte min kode over på en linux maskine og compile 
 
 
 Løsningen består altså af en række nye tokens tilsvarende de forskellige boolske operatorer.
-Derudover har parseren fået en ny gruppe: CHECK som returnerer en string med deres tilsvarende operator.
-Denne kan hefter ligges ind i en Prim2 da denne tager imod string notation af operatorerne.
-I ExprNotAccess gruppen er der tilføjet et enkelt match som er i formen af interval check. Den første og midterste expr bliver kædet sammen til en prim2 med den første check operator. Den midterste og sidste expr bliver kædet sammen af den anden check operator.
-Et Andalso binder de to primgrupper sammen.
+Derudover har parseren fået en ny gruppe: `CHECK` som returnerer en string med deres tilsvarende boolske operator fx `.<` til `<`, `.==` til `==` osv. Denne streng kan hefter ligges ind i en `Prim2`s første parameter da denne tager imod string notation af operatorerne. I ExprNotAccess gruppen er der tilføjet et enkelt match som er i formen af interval check. Den første og midterste `Expr` bliver kædet sammen til en `Prim2` med den første check operator. Den midterste og sidste `Expr` bliver kædet sammen af den anden check operator. Et `Andalso` binder de to boolske check sammen.
 
 ### 4.2)
-Jeg har lavet testkoden Opgave4-2-Tests.c
+Jeg har lavet følgende test program.
 
     void main() {
         print 2 .< 3 .< 4;
@@ -434,20 +452,21 @@ Jeg har lavet testkoden Opgave4-2-Tests.c
         // prints 1 1 1
     }
 
+*Note: linjen "print (1 .== 1 .== 1) .== 1 .< 3;" er lidt et misbrug af typer eftersom at vi benytter os af at `true` svarer til `1` og derfor er det ligemed 1.*
+
 For at køre det har jeg:
 
     fslex --unicode CLex.fsl
     fsyacc --module CPar CPar.fsy
-    fsi -r %HOMEDRIVE%%HOMEPATH%/FsYacc/Bin/FsLexYacc.Runtime.dll Absyn.fs CPar.fs CLex.fs Parse.fs Machine.fs Comp.fs ParseAndComp.fs"
+    fsi -r %HOMEDRIVE%%HOMEPATH%/FsYacc/Bin/FsLexYacc.Runtime.dll Absyn.fs CPar.fs CLex.fs Parse.fs Machine.fs Comp.fs ParseAndComp.fs
 
     open ParseAndComp;;
     compileToFile (fromFile "Opgave4-2-Tests.c") "tests.out";;
     #q;;
 
-og så kørt det i javamaskinen.
+og så kørt det i javamaskinen:
 
     javac Machine.java
     java Machine tests.out
 
-Hvilket giver de rigtige resultater.
-Note: linjen "print (1 .== 1 .== 1) .== 1 .< 3;" er lidt et misbrug af typer eftersom at vi benytter os af at `true` svarer til `1` og derfor er det ligemed 1.
+Hvilket printer de rigtige resultater. Jeg har tjekket at interval tjekket korrekt kan håndtere at resultaterne af første og anden side af den midterste værdi. Dette har jeg gjort ved at teste: (true, true), (true, false), (false, true) og (false,false) hvoraf det kun er (true,true) der skal print true/1. Derudover har jeg også prøvet at kæde dem sammen således at resultatet af en check interval godt kan inkluderes i en anden check interval. Jeg har også undersøgt at alle de nye operatorer kan give både true og false. Som en sidste ting har jeg også testet at man kan benytte sig af expressions og ikke blot værdier, blandandet i linjen `print 1+4 .>= 5-1 .<= 100-10;` og `print x .== 5 .== x;`.
